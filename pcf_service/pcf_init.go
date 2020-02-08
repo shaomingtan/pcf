@@ -2,9 +2,11 @@ package pcf_service
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"gofree5gc/lib/Nnrf_NFDiscovery"
 	"gofree5gc/lib/http2_util"
+	"gofree5gc/lib/openapi/common"
 	"gofree5gc/lib/openapi/models"
 	"gofree5gc/lib/path_util"
 	"gofree5gc/src/app"
@@ -120,6 +122,31 @@ func (pcf *PCF) Start() {
 	if err != nil {
 		initLog.Errorf("PCF register to NRF Error[%s]", err.Error())
 	}
+
+	// subscribe to all Amfs' status change
+	amfInfos := pcf_consumer.SearchAvailableAMFs(self.NrfUri, models.ServiceName_NAMF_COMM)
+	for _, amfInfo := range amfInfos {
+		client := pcf_util.GetNamfClient(amfInfo.AmfUri)
+		subscriptionData := models.SubscriptionData{
+			AmfStatusUri: fmt.Sprintf("%s/policy/amfstatus", self.GetIPv4Uri()),
+			GuamiList:    amfInfo.GuamiList,
+		}
+		result, httpResp, err := client.SubscriptionsCollectionDocumentApi.AMFStatusChangeSubscribe(context.Background(), subscriptionData)
+		if err == nil {
+			amfInfo.AmfStatusUri = result.AmfStatusUri
+		} else if httpResp != nil {
+			if httpResp.Status != err.Error() {
+				logger.InitLog.Errorf("AMF status subscribe Error[%+v]", err)
+			}
+			problemDetails := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			logger.InitLog.Errorf("AMF status subscribe Failed[%+v]", problemDetails)
+		} else {
+			logger.InitLog.Errorf("%s: server no response", amfInfo.AmfUri)
+		}
+		self.AMFStatusSubscriptionData = append(self.AMFStatusSubscriptionData, amfInfo)
+	}
+
+	// TODO: subscribe NRF NFstatus
 
 	go pcf_handler.Handle()
 	param := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{

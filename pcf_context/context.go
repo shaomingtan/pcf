@@ -43,7 +43,14 @@ type PCFContext struct {
 	BdtPolicyIdGenerator uint64
 	// App Session related
 	AppSessionPool map[string]*AppSessionData // use AppSessionId(ue.Supi-%d) or (BdtRefId-%d) as key
+	// AMF Status Change Subscription related
+	AMFStatusSubscriptionData []AMFStatusSubscriptionData
+}
 
+type AMFStatusSubscriptionData struct {
+	AmfUri       string
+	AmfStatusUri string
+	GuamiList    []models.Guami
 }
 
 type AppSessionData struct {
