@@ -126,6 +126,10 @@ func (pcf *PCF) Start() {
 	// subscribe to all Amfs' status change
 	amfInfos := pcf_consumer.SearchAvailableAMFs(self.NrfUri, models.ServiceName_NAMF_COMM)
 	for _, amfInfo := range amfInfos {
+		guamiList := pcf_util.GetNotSubscribedGuamis(amfInfo.GuamiList)
+		if len(guamiList) == 0 {
+			continue
+		}
 		client := pcf_util.GetNamfClient(amfInfo.AmfUri)
 		subscriptionData := models.SubscriptionData{
 			AmfStatusUri: fmt.Sprintf("%s/policy/amfstatus", self.GetIPv4Uri()),
