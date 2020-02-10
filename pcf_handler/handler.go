@@ -73,7 +73,9 @@ func Handle() {
 				case pcf_message.EventSMPolicyNotify:
 					ReqURI := msg.HTTPRequest.Params["ReqURI"]
 					pcf_producer.HandleSmPolicyNotify(msg.HttpChannel, ReqURI, msg.HTTPRequest.Body.(models.PolicyDataChangeNotification))
-				// TODO: http event dispatcher
+				case pcf_message.EventAMFStatusChangeNotify:
+					pcf_producer.HandleAmfStatusChangeNotify(msg.HttpChannel, msg.HTTPRequest.Body.(models.AmfStatusChangeNotification))
+					// TODO: http event dispatcher
 				default:
 					HandlerLog.Warnf("Event[%s] has not implemented", msg.Event)
 				}

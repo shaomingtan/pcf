@@ -84,7 +84,7 @@ var PolicyAuthorizationUri = "/npcf-policyauthorization/v1/app-sessions/"
 var SmUri = "/npcf-smpolicycontrol/v1"
 var IPv4Address = "192.168."
 var IPv6Address = "ffab::"
-var CheckNotifiUri = "/npcf-smpolicycontrol/v1/nudr-notify/"
+var CheckNotifiUri = "/npcf-callback/v1/nudr-notify/"
 var Ipv4_pool = make(map[string]string)
 var Ipv6_pool = make(map[string]string)
 

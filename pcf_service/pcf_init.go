@@ -132,7 +132,7 @@ func (pcf *PCF) Start() {
 		}
 		client := pcf_util.GetNamfClient(amfInfo.AmfUri)
 		subscriptionData := models.SubscriptionData{
-			AmfStatusUri: fmt.Sprintf("%s/policy/amfstatus", self.GetIPv4Uri()),
+			AmfStatusUri: fmt.Sprintf("%s/npcf-callback/v1/amfstatus", self.GetIPv4Uri()),
 			GuamiList:    amfInfo.GuamiList,
 		}
 		result, httpResp, err := client.SubscriptionsCollectionDocumentApi.AMFStatusChangeSubscribe(context.Background(), subscriptionData)
