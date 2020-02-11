@@ -2,16 +2,15 @@ package pcf_service
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"gofree5gc/lib/Nnrf_NFDiscovery"
 	"gofree5gc/lib/http2_util"
-	"gofree5gc/lib/openapi/common"
 	"gofree5gc/lib/openapi/models"
 	"gofree5gc/lib/path_util"
 	"gofree5gc/src/app"
 	"gofree5gc/src/pcf/AMPolicy"
 	"gofree5gc/src/pcf/BDTPolicy"
+	"gofree5gc/src/pcf/HttpCallback"
 	"gofree5gc/src/pcf/PolicyAuthorization"
 	"gofree5gc/src/pcf/SMPolicy"
 	"gofree5gc/src/pcf/UEPolicy"
@@ -108,6 +107,7 @@ func (pcf *PCF) Start() {
 	AMPolicy.AddService(router)
 	UEPolicy.AddService(router)
 	PolicyAuthorization.AddService(router)
+	Npcf_Callback.AddService(router)
 
 	self := pcf_context.PCF_Self()
 	pcf_util.InitpcfContext(self)
@@ -130,24 +130,12 @@ func (pcf *PCF) Start() {
 		if len(guamiList) == 0 {
 			continue
 		}
-		client := pcf_util.GetNamfClient(amfInfo.AmfUri)
-		subscriptionData := models.SubscriptionData{
-			AmfStatusUri: fmt.Sprintf("%s/npcf-callback/v1/amfstatus", self.GetIPv4Uri()),
-			GuamiList:    amfInfo.GuamiList,
+		problemDetails, err := pcf_consumer.AmfStatusChangeSubscribe(amfInfo)
+		if problemDetails != nil {
+			logger.InitLog.Warnf("AMF status subscribe Failed[%+v]", problemDetails)
+		} else if err != nil {
+			logger.InitLog.Warnf("AMF status subscribe Error[%+v]", err)
 		}
-		result, httpResp, err := client.SubscriptionsCollectionDocumentApi.AMFStatusChangeSubscribe(context.Background(), subscriptionData)
-		if err == nil {
-			amfInfo.AmfStatusUri = result.AmfStatusUri
-		} else if httpResp != nil {
-			if httpResp.Status != err.Error() {
-				logger.InitLog.Errorf("AMF status subscribe Error[%+v]", err)
-			}
-			problemDetails := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
-			logger.InitLog.Errorf("AMF status subscribe Failed[%+v]", problemDetails)
-		} else {
-			logger.InitLog.Errorf("%s: server no response", amfInfo.AmfUri)
-		}
-		self.AMFStatusSubscriptionData = append(self.AMFStatusSubscriptionData, amfInfo)
 	}
 
 	// TODO: subscribe NRF NFstatus

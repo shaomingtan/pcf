@@ -239,7 +239,7 @@ func GetNotSubscribedGuamis(guamisIn []models.Guami) (guamisOut []models.Guami) 
 
 func guamiInSubscriptionData(guami models.Guami) bool {
 	pcfSelf := pcf_context.PCF_Self()
-	for _, subscriptionData := range pcfSelf.AMFStatusSubscriptionData {
+	for _, subscriptionData := range pcfSelf.AMFStatusSubsData {
 		for _, sGuami := range subscriptionData.GuamiList {
 			if reflect.DeepEqual(sGuami, guami) {
 				return true

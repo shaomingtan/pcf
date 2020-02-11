@@ -22,6 +22,7 @@ func init() {
 	PCF_Self().BdtPolicyPool = make(map[string]models.BdtPolicy)
 	PCF_Self().BdtPolicyIdGenerator = 1
 	PCF_Self().AppSessionPool = make(map[string]*AppSessionData)
+	PCF_Self().AMFStatusSubsData = make(map[string]AMFStatusSubscriptionData)
 }
 
 type PCFContext struct {
@@ -44,7 +45,7 @@ type PCFContext struct {
 	// App Session related
 	AppSessionPool map[string]*AppSessionData // use AppSessionId(ue.Supi-%d) or (BdtRefId-%d) as key
 	// AMF Status Change Subscription related
-	AMFStatusSubscriptionData []AMFStatusSubscriptionData
+	AMFStatusSubsData map[string]AMFStatusSubscriptionData // subscriptionId as key
 }
 
 type AMFStatusSubscriptionData struct {

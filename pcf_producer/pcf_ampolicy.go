@@ -210,10 +210,10 @@ func PostPolicies(httpChannel chan pcf_message.HttpResponseMessage, request mode
 
 	if request.Guami != nil {
 		// if consumer is AMF then subscribe this AMF Status
-		for _, subscribedData := range pcfSelf.AMFStatusSubscriptionData {
-			for _, guami := range subscribedData.GuamiList {
+		for _, statusSubsData := range pcfSelf.AMFStatusSubsData {
+			for _, guami := range statusSubsData.GuamiList {
 				if reflect.DeepEqual(guami, request.Guami) {
-					amPolicy.AmfStatusChangeSubscription = &subscribedData
+					amPolicy.AmfStatusChangeSubscription = &statusSubsData
 				}
 			}
 		}
