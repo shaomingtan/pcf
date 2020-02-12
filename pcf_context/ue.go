@@ -59,6 +59,8 @@ type UeAMPolicyData struct {
 	AmPolicyData *models.AmPolicyData // Svbscription Data
 	// Corresponding UE
 	PcfUe *UeContext
+	// AMF status change subscription
+	AmfStatusChangeSubscription *AMFStatusSubscriptionData
 }
 
 type UeSmPolicyData struct {

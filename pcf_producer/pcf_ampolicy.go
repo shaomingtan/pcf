@@ -11,6 +11,7 @@ import (
 	"gofree5gc/src/pcf/pcf_handler/pcf_message"
 	"gofree5gc/src/pcf/pcf_util"
 	"net/http"
+	"reflect"
 )
 
 func DeletePoliciesPolAssoId(httpChannel chan pcf_message.HttpResponseMessage, polAssoId string) {
@@ -209,19 +210,11 @@ func PostPolicies(httpChannel chan pcf_message.HttpResponseMessage, request mode
 
 	if request.Guami != nil {
 		// if consumer is AMF then subscribe this AMF Status
-		amfUri := pcf_consumer.SendNFIntancesAMF(pcfSelf.NrfUri, *request.Guami, models.ServiceName_NAMF_COMM)
-		if amfUri != "" {
-			client := pcf_util.GetNamfClient(amfUri)
-			//TODO: Add AMF status Notify Handler
-			subscriptiondata := models.SubscriptionData{
-				AmfStatusUri: fmt.Sprintf("%s/policies/%s/amfstatus", pcfSelf.GetIPv4Uri(), assolId),
-				GuamiList: []models.Guami{
-					*request.Guami,
-				},
-			}
-			subscriptionData, response, err := client.SubscriptionsCollectionDocumentApi.AMFStatusChangeSubscribe(context.Background(), subscriptiondata)
-			if err == nil && response.StatusCode == http.StatusCreated {
-				amPolicy.AmfStatusUri = subscriptionData.AmfStatusUri
+		for _, statusSubsData := range pcfSelf.AMFStatusSubsData {
+			for _, guami := range statusSubsData.GuamiList {
+				if reflect.DeepEqual(guami, request.Guami) {
+					amPolicy.AmfStatusChangeSubscription = &statusSubsData
+				}
 			}
 		}
 	}

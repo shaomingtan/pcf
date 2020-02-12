@@ -22,6 +22,7 @@ func init() {
 	PCF_Self().BdtPolicyPool = make(map[string]models.BdtPolicy)
 	PCF_Self().BdtPolicyIdGenerator = 1
 	PCF_Self().AppSessionPool = make(map[string]*AppSessionData)
+	PCF_Self().AMFStatusSubsData = make(map[string]AMFStatusSubscriptionData)
 }
 
 type PCFContext struct {
@@ -43,7 +44,14 @@ type PCFContext struct {
 	BdtPolicyIdGenerator uint64
 	// App Session related
 	AppSessionPool map[string]*AppSessionData // use AppSessionId(ue.Supi-%d) or (BdtRefId-%d) as key
+	// AMF Status Change Subscription related
+	AMFStatusSubsData map[string]AMFStatusSubscriptionData // subscriptionId as key
+}
 
+type AMFStatusSubscriptionData struct {
+	AmfUri       string
+	AmfStatusUri string
+	GuamiList    []models.Guami
 }
 
 type AppSessionData struct {
@@ -77,7 +85,7 @@ var PolicyAuthorizationUri = "/npcf-policyauthorization/v1/app-sessions/"
 var SmUri = "/npcf-smpolicycontrol/v1"
 var IPv4Address = "192.168."
 var IPv6Address = "ffab::"
-var CheckNotifiUri = "/npcf-smpolicycontrol/v1/nudr-notify/"
+var CheckNotifiUri = "/npcf-callback/v1/nudr-notify/"
 var Ipv4_pool = make(map[string]string)
 var Ipv6_pool = make(map[string]string)
 

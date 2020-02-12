@@ -227,3 +227,24 @@ func CheckPolicyControlReqTrig(triggers []models.PolicyControlRequestTrigger, re
 	}
 	return false
 }
+
+func GetNotSubscribedGuamis(guamisIn []models.Guami) (guamisOut []models.Guami) {
+	for _, guami := range guamisIn {
+		if !guamiInSubscriptionData(guami) {
+			guamisOut = append(guamisOut, guami)
+		}
+	}
+	return
+}
+
+func guamiInSubscriptionData(guami models.Guami) bool {
+	pcfSelf := pcf_context.PCF_Self()
+	for _, subscriptionData := range pcfSelf.AMFStatusSubsData {
+		for _, sGuami := range subscriptionData.GuamiList {
+			if reflect.DeepEqual(sGuami, guami) {
+				return true
+			}
+		}
+	}
+	return false
+}
