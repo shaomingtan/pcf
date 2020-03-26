@@ -22,6 +22,7 @@ var SMpolicylog *logrus.Entry
 var Consumerlog *logrus.Entry
 var UtilLog *logrus.Entry
 var CallbackLog *logrus.Entry
+var OamLog *logrus.Entry
 
 func init() {
 	log = logrus.New()
@@ -58,6 +59,7 @@ func init() {
 	UtilLog = log.WithFields(logrus.Fields{"PCF": "Util"})
 	CallbackLog = log.WithFields(logrus.Fields{"PCF": "Callback"})
 	Consumerlog = log.WithFields(logrus.Fields{"PCF": "Consumer"})
+	OamLog = log.WithFields(logrus.Fields{"PCF": "OAM"})
 }
 
 func SetLogLevel(level logrus.Level) {
