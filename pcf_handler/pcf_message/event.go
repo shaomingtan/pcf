@@ -20,4 +20,5 @@ const (
 	EventSMPolicyDelete        = "EventSMPolicyDelete Message"
 	EventSMPolicyNotify        = "EventSMPolicyNotify Message"
 	EventAMFStatusChangeNotify = "EventAMFStatusChangeNotify Message"
+	EventOAMGetAmPolicy        = "EventOAMGetAmPolicy Message"
 )

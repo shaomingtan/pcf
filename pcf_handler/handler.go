@@ -76,6 +76,9 @@ func Handle() {
 				case pcf_message.EventAMFStatusChangeNotify:
 					pcf_producer.HandleAmfStatusChangeNotify(msg.HttpChannel, msg.HTTPRequest.Body.(models.AmfStatusChangeNotification))
 					// TODO: http event dispatcher
+				case pcf_message.EventOAMGetAmPolicy:
+					supi := msg.HTTPRequest.Params["supi"]
+					pcf_producer.HandleOAMGetAmPolicy(msg.HttpChannel, supi)
 				default:
 					HandlerLog.Warnf("Event[%s] has not implemented", msg.Event)
 				}

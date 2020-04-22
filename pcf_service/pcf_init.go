@@ -3,6 +3,7 @@ package pcf_service
 import (
 	"bufio"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"gofree5gc/lib/Nnrf_NFDiscovery"
 	"gofree5gc/lib/http2_util"
 	"gofree5gc/lib/openapi/models"
@@ -11,6 +12,7 @@ import (
 	"gofree5gc/src/pcf/AMPolicy"
 	"gofree5gc/src/pcf/BDTPolicy"
 	"gofree5gc/src/pcf/HttpCallback"
+	"gofree5gc/src/pcf/OAM"
 	"gofree5gc/src/pcf/PolicyAuthorization"
 	"gofree5gc/src/pcf/SMPolicy"
 	"gofree5gc/src/pcf/UEPolicy"
@@ -108,6 +110,16 @@ func (pcf *PCF) Start() {
 	UEPolicy.AddService(router)
 	PolicyAuthorization.AddService(router)
 	Npcf_Callback.AddService(router)
+	Npcf_OAM.AddService(router)
+
+	router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "User-Agent", "Referrer", "Host", "Token", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+		MaxAge:           86400,
+	}))
 
 	self := pcf_context.PCF_Self()
 	pcf_util.InitpcfContext(self)
