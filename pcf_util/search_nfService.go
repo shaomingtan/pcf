@@ -2,7 +2,7 @@ package pcf_util
 
 import (
 	"fmt"
-	"gofree5gc/lib/openapi/models"
+	"free5gc/lib/openapi/models"
 )
 
 // SearchNFServiceUri returns NF Uri derived from NfProfile with corresponding service

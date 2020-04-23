@@ -7,23 +7,23 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"gofree5gc/lib/CommonConsumerTestData/PCF/TestAMPolicy"
-	"gofree5gc/lib/CommonConsumerTestData/PCF/TestSMPolicy"
-	"gofree5gc/lib/MongoDBLibrary"
-	"gofree5gc/lib/Npcf_AMPolicy"
-	"gofree5gc/lib/Npcf_SMPolicyControl"
-	"gofree5gc/lib/http2_util"
-	"gofree5gc/lib/openapi/common"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/lib/path_util"
-	"gofree5gc/src/amf/amf_service"
-	"gofree5gc/src/app"
-	"gofree5gc/src/nrf/nrf_service"
-	"gofree5gc/src/pcf/logger"
-	"gofree5gc/src/pcf/pcf_context"
-	"gofree5gc/src/pcf/pcf_producer"
-	"gofree5gc/src/pcf/pcf_service"
-	"gofree5gc/src/udr/udr_service"
+	"free5gc/lib/CommonConsumerTestData/PCF/TestAMPolicy"
+	"free5gc/lib/CommonConsumerTestData/PCF/TestSMPolicy"
+	"free5gc/lib/MongoDBLibrary"
+	"free5gc/lib/Npcf_AMPolicy"
+	"free5gc/lib/Npcf_SMPolicyControl"
+	"free5gc/lib/http2_util"
+	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi/models"
+	"free5gc/lib/path_util"
+	"free5gc/src/amf/amf_service"
+	"free5gc/src/app"
+	"free5gc/src/nrf/nrf_service"
+	"free5gc/src/pcf/logger"
+	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/pcf_producer"
+	"free5gc/src/pcf/pcf_service"
+	"free5gc/src/udr/udr_service"
 	"net/http"
 	"reflect"
 	"strings"
@@ -597,9 +597,9 @@ func TestSMPolicyNotification(t *testing.T) {
 			}
 		})
 
-		smfLogPath := path_util.Gofree5gcPath("gofree5gc/smfsslkey.log")
-		smfPemPath := path_util.Gofree5gcPath("gofree5gc/support/TLS/smf.pem")
-		smfKeyPath := path_util.Gofree5gcPath("gofree5gc/support/TLS/smf.key")
+		smfLogPath := path_util.Gofree5gcPath("free5gc/smfsslkey.log")
+		smfPemPath := path_util.Gofree5gcPath("free5gc/support/TLS/smf.pem")
+		smfKeyPath := path_util.Gofree5gcPath("free5gc/support/TLS/smf.key")
 
 		server, err := http2_util.NewServer(":8888", smfLogPath, router)
 		if err == nil && server != nil {

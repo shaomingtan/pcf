@@ -2,7 +2,7 @@ package pcf_util
 
 import (
 	"fmt"
-	"gofree5gc/lib/openapi/models"
+	"free5gc/lib/openapi/models"
 )
 
 var policyTriggerArray = []models.PolicyControlRequestTrigger{

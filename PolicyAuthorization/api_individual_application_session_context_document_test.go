@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
-	"gofree5gc/lib/CommonConsumerTestData/PCF/TestAMPolicy"
-	"gofree5gc/lib/CommonConsumerTestData/PCF/TestPolicyAuthorization"
-	"gofree5gc/lib/CommonConsumerTestData/PCF/TestSMPolicy"
-	"gofree5gc/lib/MongoDBLibrary"
-	"gofree5gc/lib/Npcf_AMPolicy"
-	"gofree5gc/lib/Npcf_PolicyAuthorization"
-	"gofree5gc/lib/Npcf_SMPolicyControl"
-	"gofree5gc/lib/openapi/common"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/lib/path_util"
-	"gofree5gc/src/pcf/pcf_context"
+	"free5gc/lib/CommonConsumerTestData/PCF/TestAMPolicy"
+	"free5gc/lib/CommonConsumerTestData/PCF/TestPolicyAuthorization"
+	"free5gc/lib/CommonConsumerTestData/PCF/TestSMPolicy"
+	"free5gc/lib/MongoDBLibrary"
+	"free5gc/lib/Npcf_AMPolicy"
+	"free5gc/lib/Npcf_PolicyAuthorization"
+	"free5gc/lib/Npcf_SMPolicyControl"
+	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi/models"
+	"free5gc/lib/path_util"
+	"free5gc/src/pcf/pcf_context"
 	"net/http"
 	"strings"
 	"testing"
@@ -54,8 +54,8 @@ func fakeAfServer(t *testing.T, port string) {
 			c.JSON(http.StatusNoContent, gin.H{})
 		})
 
-		pcfPemPath := path_util.Gofree5gcPath("gofree5gc/support/TLS/pcf.pem")
-		pcfKeyPath := path_util.Gofree5gcPath("gofree5gc/support/TLS/pcf.key")
+		pcfPemPath := path_util.Gofree5gcPath("free5gc/support/TLS/pcf.pem")
+		pcfKeyPath := path_util.Gofree5gcPath("free5gc/support/TLS/pcf.key")
 
 		server := &http.Server{
 			Addr:    port,

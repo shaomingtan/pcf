@@ -1,12 +1,12 @@
 package pcf_handler_test
 
 import (
-	// "gofree5gc/lib/CommonConsumerTestData/AMF/TestAmf"
-	// "gofree5gc/lib/ngap"
-	// "gofree5gc/src/test/ngapTestpacket"
-	// "gofree5gc/src/amf/amf_handler"
-	// "gofree5gc/src/amf/amf_handler/amf_message"
-	// "gofree5gc/src/amf/amf_ngap"
+	// "free5gc/lib/CommonConsumerTestData/AMF/TestAmf"
+	// "free5gc/lib/ngap"
+	// "free5gc/src/test/ngapTestpacket"
+	// "free5gc/src/amf/amf_handler"
+	// "free5gc/src/amf/amf_handler/amf_message"
+	// "free5gc/src/amf/amf_ngap"
 	"testing"
 	// "time"
 )

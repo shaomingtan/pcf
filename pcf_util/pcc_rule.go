@@ -2,10 +2,10 @@ package pcf_util
 
 import (
 	"fmt"
-	"gofree5gc/lib/openapi/models"
+	"free5gc/lib/openapi/models"
 	"time"
-	// 	"gofree5gc/lib/path_util"
-	// 	"gofree5gc/src/pcf/factory"
+	// 	"free5gc/lib/path_util"
+	// 	"free5gc/src/pcf/factory"
 )
 
 var MediaTypeTo5qiMap = map[models.MediaType]int32{

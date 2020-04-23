@@ -2,10 +2,10 @@ package pcf_util
 
 import (
 	"encoding/hex"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/src/pcf/factory"
-	"gofree5gc/src/pcf/logger"
-	"gofree5gc/src/pcf/pcf_context"
+	"free5gc/lib/openapi/models"
+	"free5gc/src/pcf/factory"
+	"free5gc/src/pcf/logger"
+	"free5gc/src/pcf/pcf_context"
 
 	"github.com/google/uuid"
 )

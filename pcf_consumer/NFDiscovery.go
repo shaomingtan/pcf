@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/antihax/optional"
-	"gofree5gc/lib/Nnrf_NFDiscovery"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/src/pcf/logger"
-	"gofree5gc/src/pcf/pcf_context"
-	"gofree5gc/src/pcf/pcf_util"
+	"free5gc/lib/Nnrf_NFDiscovery"
+	"free5gc/lib/openapi/models"
+	"free5gc/src/pcf/logger"
+	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/pcf_util"
 	"net/http"
 )
 

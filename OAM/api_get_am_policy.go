@@ -2,8 +2,8 @@ package Npcf_OAM
 
 import (
 	"github.com/gin-gonic/gin"
-	"gofree5gc/lib/http_wrapper"
-	"gofree5gc/src/pcf/pcf_handler/pcf_message"
+	"free5gc/lib/http_wrapper"
+	"free5gc/src/pcf/pcf_handler/pcf_message"
 )
 
 func setCorsHeader(c *gin.Context) {

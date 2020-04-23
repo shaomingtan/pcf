@@ -3,10 +3,10 @@ package pcf_producer
 import (
 	// "context"
 	// "fmt"
-	"gofree5gc/lib/openapi/models"
-	// "gofree5gc/src/pcf/pcf_context"
-	"gofree5gc/src/pcf/pcf_handler/pcf_message"
-	// "gofree5gc/src/pcf/pcf_util"
+	"free5gc/lib/openapi/models"
+	// "free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/pcf_handler/pcf_message"
+	// "free5gc/src/pcf/pcf_util"
 	// "github.com/gin-gonic/gin"
 )
 
