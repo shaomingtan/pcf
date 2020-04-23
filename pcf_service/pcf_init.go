@@ -170,9 +170,8 @@ func (pcf *PCF) Start() {
 	server, err := http2_util.NewServer(addr, pcf_util.PCF_LOG_PATH, router)
 	if err == nil && server != nil {
 		initLog.Infoln(server.ListenAndServeTLS(pcf_util.PCF_PEM_PATH, pcf_util.PCF_KEY_PATH))
-	}
-	if err != nil {
-		initLog.Errorln(err)
+	} else {
+		initLog.Fatalf("Initialize http2 server failed: %+v", err)
 	}
 }
 
