@@ -2,7 +2,7 @@ package pcf_context
 
 import (
 	"fmt"
-	"gofree5gc/lib/openapi/models"
+	"free5gc/lib/openapi/models"
 	"math"
 	"reflect"
 	"strconv"

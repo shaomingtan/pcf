@@ -2,13 +2,13 @@ package pcf_consumer_test
 
 import (
 	"flag"
-	"gofree5gc/lib/MongoDBLibrary"
-	"gofree5gc/lib/Nnrf_NFDiscovery"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/src/nrf/nrf_service"
-	"gofree5gc/src/pcf/factory"
-	"gofree5gc/src/pcf/pcf_consumer"
-	"gofree5gc/src/pcf/pcf_service"
+	"free5gc/lib/MongoDBLibrary"
+	"free5gc/lib/Nnrf_NFDiscovery"
+	"free5gc/lib/openapi/models"
+	"free5gc/src/nrf/nrf_service"
+	"free5gc/src/pcf/factory"
+	"free5gc/src/pcf/pcf_consumer"
+	"free5gc/src/pcf/pcf_service"
 	"testing"
 	"time"
 

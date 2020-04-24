@@ -3,9 +3,9 @@ package BDTPolicy_test
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
-	TestBDTPolicy "gofree5gc/lib/CommonConsumerTestData/PCF/TestBDTPolicy"
-	"gofree5gc/lib/Npcf_BDTPolicyControl"
-	"gofree5gc/lib/openapi/models"
+	TestBDTPolicy "free5gc/lib/CommonConsumerTestData/PCF/TestBDTPolicy"
+	"free5gc/lib/Npcf_BDTPolicyControl"
+	"free5gc/lib/openapi/models"
 	"net/http"
 	"strings"
 	"testing"

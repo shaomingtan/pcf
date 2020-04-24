@@ -3,11 +3,11 @@ package pcf_consumer
 import (
 	"context"
 	"fmt"
-	"gofree5gc/lib/openapi/common"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/src/pcf/logger"
-	"gofree5gc/src/pcf/pcf_context"
-	"gofree5gc/src/pcf/pcf_util"
+	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi/models"
+	"free5gc/src/pcf/logger"
+	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/pcf_util"
 	"strings"
 )
 

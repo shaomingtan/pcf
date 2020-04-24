@@ -3,9 +3,9 @@ package pcf_consumer
 import (
 	"context"
 	"fmt"
-	"gofree5gc/lib/Nnrf_NFManagement"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/src/pcf/pcf_context"
+	"free5gc/lib/Nnrf_NFManagement"
+	"free5gc/lib/openapi/models"
+	"free5gc/src/pcf/pcf_context"
 	"net/http"
 	"strings"
 	"time"
@@ -23,7 +23,7 @@ func BuildNFInstance(context *pcf_context.PCFContext) (profile models.NfProfile,
 	profile.NfServices = &service
 	profile.PcfInfo = &models.PcfInfo{
 		DnnList: []string{
-			"gofree5gc",
+			"free5gc",
 			"internet",
 		},
 		// SupiRanges: &[]models.SupiRange{

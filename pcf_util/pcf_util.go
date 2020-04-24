@@ -4,14 +4,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"gofree5gc/lib/Namf_Communication"
-	"gofree5gc/lib/Npcf_AMPolicy"
-	"gofree5gc/lib/Npcf_PolicyAuthorization"
-	"gofree5gc/lib/Npcf_SMPolicyControl"
-	"gofree5gc/lib/Nudr_DataRepository"
-	"gofree5gc/lib/openapi/models"
-	"gofree5gc/lib/path_util"
-	"gofree5gc/src/pcf/pcf_context"
+	"free5gc/lib/Namf_Communication"
+	"free5gc/lib/Npcf_AMPolicy"
+	"free5gc/lib/Npcf_PolicyAuthorization"
+	"free5gc/lib/Npcf_SMPolicyControl"
+	"free5gc/lib/Nudr_DataRepository"
+	"free5gc/lib/openapi/models"
+	"free5gc/lib/path_util"
+	"free5gc/src/pcf/pcf_context"
 	"net/http"
 	"reflect"
 	"time"
@@ -21,10 +21,10 @@ const TimeFormat = time.RFC3339
 
 // Path of HTTP2 key and log file
 var (
-	PCF_LOG_PATH                                 = path_util.Gofree5gcPath("gofree5gc/pcfsslkey.log")
-	PCF_PEM_PATH                                 = path_util.Gofree5gcPath("gofree5gc/support/TLS/pcf.pem")
-	PCF_KEY_PATH                                 = path_util.Gofree5gcPath("gofree5gc/support/TLS/pcf.key")
-	PCF_CONFIG_PATH                              = path_util.Gofree5gcPath("gofree5gc/config/pcfcfg.conf")
+	PCF_LOG_PATH                                 = path_util.Gofree5gcPath("free5gc/pcfsslkey.log")
+	PCF_PEM_PATH                                 = path_util.Gofree5gcPath("free5gc/support/TLS/pcf.pem")
+	PCF_KEY_PATH                                 = path_util.Gofree5gcPath("free5gc/support/TLS/pcf.key")
+	PCF_CONFIG_PATH                              = path_util.Gofree5gcPath("free5gc/config/pcfcfg.conf")
 	PCF_BASIC_PATH                               = "https://localhost:29507"
 	ERROR_REQUEST_PARAMETERS                     = "ERROR_REQUEST_PARAMETERS"
 	USER_UNKNOWN                                 = "USER_UNKNOWN"
