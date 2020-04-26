@@ -70,9 +70,10 @@ func (*PCF) Initialize(c *cli.Context) {
 		pcfcfg: c.String("pcfcfg"),
 	}
 	if config.pcfcfg != "" {
-		factory.InitConfigFactory(path_util.Gofree5gcPath(config.pcfcfg))
+		factory.InitConfigFactory(config.pcfcfg)
 	} else {
-		factory.InitConfigFactory(pcf_util.PCF_CONFIG_PATH)
+		DefaultPcfConfigPath := path_util.Gofree5gcPath("free5gc/config/pcfcfg.conf")
+		factory.InitConfigFactory(DefaultPcfConfigPath)
 	}
 
 	initLog.Traceln("PCF debug level(string):", app.ContextSelf().Logger.PCF.DebugLevel)
