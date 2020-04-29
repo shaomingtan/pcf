@@ -1,4 +1,4 @@
-package SMPolicy_test
+package smpolicy_test
 
 import (
 	"context"
