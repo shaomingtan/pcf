@@ -3,13 +3,13 @@ package pcf_producer
 import (
 	"context"
 	"fmt"
-	"github.com/mohae/deepcopy"
 	"free5gc/lib/openapi/models"
+	"free5gc/src/pcf/consumer"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_consumer"
 	"free5gc/src/pcf/pcf_context"
 	"free5gc/src/pcf/pcf_handler/pcf_message"
 	"free5gc/src/pcf/pcf_util"
+	"github.com/mohae/deepcopy"
 	"net/http"
 	"reflect"
 )
@@ -311,5 +311,5 @@ func getUdrUri(ue *pcf_context.UeContext) string {
 	if ue.UdrUri != "" {
 		return ue.UdrUri
 	}
-	return pcf_consumer.SendNFIntancesUDR(pcf_context.PCF_Self().NrfUri, ue.Supi)
+	return consumer.SendNFIntancesUDR(pcf_context.PCF_Self().NrfUri, ue.Supi)
 }

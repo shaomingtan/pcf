@@ -16,7 +16,7 @@ import (
 	"free5gc/src/pcf/httpcallback"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/oam"
-	"free5gc/src/pcf/pcf_consumer"
+	"free5gc/src/pcf/consumer"
 	"free5gc/src/pcf/pcf_context"
 	"free5gc/src/pcf/pcf_handler"
 	"free5gc/src/pcf/pcf_util"
@@ -127,23 +127,23 @@ func (pcf *PCF) Start() {
 
 	addr := fmt.Sprintf("%s:%d", self.HttpIPv4Address, self.HttpIpv4Port)
 
-	profile, err := pcf_consumer.BuildNFInstance(self)
+	profile, err := consumer.BuildNFInstance(self)
 	if err != nil {
 		initLog.Error("Build PCF Profile Error")
 	}
-	_, self.NfId, err = pcf_consumer.SendRegisterNFInstance(self.NrfUri, self.NfId, profile)
+	_, self.NfId, err = consumer.SendRegisterNFInstance(self.NrfUri, self.NfId, profile)
 	if err != nil {
 		initLog.Errorf("PCF register to NRF Error[%s]", err.Error())
 	}
 
 	// subscribe to all Amfs' status change
-	amfInfos := pcf_consumer.SearchAvailableAMFs(self.NrfUri, models.ServiceName_NAMF_COMM)
+	amfInfos := consumer.SearchAvailableAMFs(self.NrfUri, models.ServiceName_NAMF_COMM)
 	for _, amfInfo := range amfInfos {
 		guamiList := pcf_util.GetNotSubscribedGuamis(amfInfo.GuamiList)
 		if len(guamiList) == 0 {
 			continue
 		}
-		problemDetails, err := pcf_consumer.AmfStatusChangeSubscribe(amfInfo)
+		problemDetails, err := consumer.AmfStatusChangeSubscribe(amfInfo)
 		if problemDetails != nil {
 			logger.InitLog.Warnf("AMF status subscribe Failed[%+v]", problemDetails)
 		} else if err != nil {
@@ -157,7 +157,7 @@ func (pcf *PCF) Start() {
 	param := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
 		ServiceNames: optional.NewInterface([]models.ServiceName{models.ServiceName_NUDR_DR}),
 	}
-	resp, err := pcf_consumer.SendSearchNFInstances(self.NrfUri, models.NfType_UDR, models.NfType_PCF, param)
+	resp, err := consumer.SendSearchNFInstances(self.NrfUri, models.NfType_UDR, models.NfType_PCF, param)
 	for _, nfProfile := range resp.NfInstances {
 		udruri := pcf_util.SearchNFServiceUri(nfProfile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 		if udruri != "" {

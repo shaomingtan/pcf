@@ -1,4 +1,4 @@
-package pcf_consumer_test
+package consumer_test
 
 import (
 	"flag"
@@ -7,7 +7,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/nrf/nrf_service"
 	"free5gc/src/pcf/factory"
-	"free5gc/src/pcf/pcf_consumer"
+	"free5gc/src/pcf/consumer"
 	"free5gc/src/pcf/pcf_service"
 	"testing"
 	"time"
@@ -41,7 +41,7 @@ func TestRegisterNFInstance(t *testing.T) {
 	param := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
 		ServiceNames: optional.NewInterface([]models.ServiceName{models.ServiceName_NPCF_AM_POLICY_CONTROL, models.ServiceName_NPCF_BDTPOLICYCONTROL, models.ServiceName_NPCF_POLICYAUTHORIZATION, models.ServiceName_NPCF_SMPOLICYCONTROL, models.ServiceName_NPCF_UE_POLICY_CONTROL}),
 	}
-	result, err := pcf_consumer.SendSearchNFInstances(factory.PcfConfig.Configuration.NrfUri, models.NfType_PCF, models.NfType_UDR, param)
+	result, err := consumer.SendSearchNFInstances(factory.PcfConfig.Configuration.NrfUri, models.NfType_PCF, models.NfType_UDR, param)
 	if err != nil {
 		t.Error(err.Error())
 	} else if result.NfInstances == nil {

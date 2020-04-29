@@ -9,7 +9,7 @@ import (
 	"free5gc/lib/Nudr_DataRepository"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_consumer"
+	"free5gc/src/pcf/consumer"
 	"free5gc/src/pcf/pcf_context"
 	"free5gc/src/pcf/pcf_handler/pcf_message"
 	"free5gc/src/pcf/pcf_util"
@@ -170,7 +170,7 @@ func getDefaultUdrUri(context *pcf_context.PCFContext) string {
 	param := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
 		ServiceNames: optional.NewInterface([]models.ServiceName{models.ServiceName_NUDR_DR}),
 	}
-	resp, err := pcf_consumer.SendSearchNFInstances(context.NrfUri, models.NfType_UDR, models.NfType_PCF, param)
+	resp, err := consumer.SendSearchNFInstances(context.NrfUri, models.NfType_UDR, models.NfType_PCF, param)
 	if err != nil {
 		return ""
 	}

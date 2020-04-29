@@ -1,4 +1,4 @@
-package pcf_consumer
+package consumer
 
 import (
 	"context"
