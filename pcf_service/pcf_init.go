@@ -8,7 +8,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
 	"free5gc/src/app"
-	"free5gc/src/pcf/PolicyAuthorization"
+	"free5gc/src/pcf/policyauthorization"
 	"free5gc/src/pcf/SMPolicy"
 	"free5gc/src/pcf/UEPolicy"
 	"free5gc/src/pcf/ampolicy"
@@ -109,7 +109,7 @@ func (pcf *PCF) Start() {
 	SMPolicy.AddService(router)
 	ampolicy.AddService(router)
 	UEPolicy.AddService(router)
-	PolicyAuthorization.AddService(router)
+	policyauthorization.AddService(router)
 	httpcallback.AddService(router)
 	oam.AddService(router)
 

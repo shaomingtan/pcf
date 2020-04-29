@@ -1,4 +1,4 @@
-package PolicyAuthorization_test
+package policyauthorization_test
 
 import (
 	"context"
