@@ -2,9 +2,9 @@ package handler
 
 import (
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
-	"free5gc/src/pcf/pcf_producer"
+	"free5gc/src/pcf/logger"
+	"free5gc/src/pcf/producer"
 	"time"
 
 	"github.com/sirupsen/logrus"

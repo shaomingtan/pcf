@@ -19,8 +19,8 @@ import (
 	"free5gc/src/nrf/nrf_service"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_producer"
 	"free5gc/src/pcf/pcf_service"
+	"free5gc/src/pcf/producer"
 	"free5gc/src/udr/udr_service"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -645,14 +645,14 @@ func TestSMPolicyNotification(t *testing.T) {
 	notification := models.SmPolicyNotification{
 		ResourceUri: smCreateReqData.NotificationUri,
 	}
-	pcf_producer.SendSMPolicyUpdateNotification(ue, smPolicyId, notification)
+	producer.SendSMPolicyUpdateNotification(ue, smPolicyId, notification)
 
 	//Test Policies Termination Notify
 	termination := models.TerminationNotification{
 		ResourceUri: smCreateReqData.NotificationUri,
 		Cause:       models.PolicyAssociationReleaseCause_UNSPECIFIED,
 	}
-	pcf_producer.SendSMPolicyTerminationRequestNotification(ue, smPolicyId, termination)
+	producer.SendSMPolicyTerminationRequestNotification(ue, smPolicyId, termination)
 
 	time.Sleep(200 * time.Millisecond)
 }

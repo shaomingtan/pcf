@@ -17,7 +17,7 @@ import (
 	"free5gc/src/nrf/nrf_service"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_producer"
+	"free5gc/src/pcf/producer"
 	"free5gc/src/pcf/pcf_service"
 	"free5gc/src/udr/udr_service"
 	"github.com/gin-gonic/gin"
@@ -327,14 +327,14 @@ func TestAMPolicyNotification(t *testing.T) {
 	policyUpdate := models.PolicyUpdate{
 		ResourceUri: amCreateReqData.NotificationUri,
 	}
-	pcf_producer.SendAMPolicyUpdateNotification(ue, polAssoId, policyUpdate)
+	producer.SendAMPolicyUpdateNotification(ue, polAssoId, policyUpdate)
 
 	//Test Policies Termination Notify
 	notification := models.TerminationNotification{
 		ResourceUri: amCreateReqData.NotificationUri,
 		Cause:       models.PolicyAssociationReleaseCause_UNSPECIFIED,
 	}
-	pcf_producer.SendAMPolicyTerminationRequestNotification(ue, polAssoId, notification)
+	producer.SendAMPolicyTerminationRequestNotification(ue, polAssoId, notification)
 
 	time.Sleep(200 * time.Millisecond)
 }
