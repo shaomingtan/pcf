@@ -1,4 +1,4 @@
-package Npcf_Callback
+package httpcallback
 
 import (
 	"free5gc/lib/http_wrapper"

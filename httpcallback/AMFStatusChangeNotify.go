@@ -1,11 +1,11 @@
-package Npcf_Callback
+package httpcallback
 
 import (
-	"github.com/gin-gonic/gin"
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/pcf_handler/pcf_message"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 

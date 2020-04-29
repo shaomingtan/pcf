@@ -1,4 +1,4 @@
-package Npcf_Callback
+package httpcallback
 
 import (
 	"net/http"

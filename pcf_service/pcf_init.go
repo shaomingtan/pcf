@@ -11,7 +11,7 @@ import (
 	"free5gc/src/app"
 	"free5gc/src/pcf/ampolicy"
 	"free5gc/src/pcf/bdtpolicy"
-	"free5gc/src/pcf/HttpCallback"
+	"free5gc/src/pcf/httpcallback"
 	"free5gc/src/pcf/OAM"
 	"free5gc/src/pcf/PolicyAuthorization"
 	"free5gc/src/pcf/SMPolicy"
@@ -110,7 +110,7 @@ func (pcf *PCF) Start() {
 	ampolicy.AddService(router)
 	UEPolicy.AddService(router)
 	PolicyAuthorization.AddService(router)
-	Npcf_Callback.AddService(router)
+	httpcallback.AddService(router)
 	Npcf_OAM.AddService(router)
 
 	router.Use(cors.New(cors.Config{
