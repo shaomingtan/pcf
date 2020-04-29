@@ -1,4 +1,4 @@
-package pcf_util
+package util
 
 import (
 	"fmt"

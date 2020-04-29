@@ -19,7 +19,7 @@ import (
 	"free5gc/src/pcf/consumer"
 	"free5gc/src/pcf/context"
 	"free5gc/src/pcf/handler"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 	"github.com/gin-contrib/cors"
 	"os/exec"
 	"sync"
@@ -123,7 +123,7 @@ func (pcf *PCF) Start() {
 	}))
 
 	self := context.PCF_Self()
-	pcf_util.InitpcfContext(self)
+	util.InitpcfContext(self)
 
 	addr := fmt.Sprintf("%s:%d", self.HttpIPv4Address, self.HttpIpv4Port)
 
@@ -139,7 +139,7 @@ func (pcf *PCF) Start() {
 	// subscribe to all Amfs' status change
 	amfInfos := consumer.SearchAvailableAMFs(self.NrfUri, models.ServiceName_NAMF_COMM)
 	for _, amfInfo := range amfInfos {
-		guamiList := pcf_util.GetNotSubscribedGuamis(amfInfo.GuamiList)
+		guamiList := util.GetNotSubscribedGuamis(amfInfo.GuamiList)
 		if len(guamiList) == 0 {
 			continue
 		}
@@ -159,7 +159,7 @@ func (pcf *PCF) Start() {
 	}
 	resp, err := consumer.SendSearchNFInstances(self.NrfUri, models.NfType_UDR, models.NfType_PCF, param)
 	for _, nfProfile := range resp.NfInstances {
-		udruri := pcf_util.SearchNFServiceUri(nfProfile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+		udruri := util.SearchNFServiceUri(nfProfile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 		if udruri != "" {
 			self.DefaultUdrUri = udruri
 			break
@@ -168,9 +168,9 @@ func (pcf *PCF) Start() {
 	if err != nil {
 		initLog.Errorln(err)
 	}
-	server, err := http2_util.NewServer(addr, pcf_util.PCF_LOG_PATH, router)
+	server, err := http2_util.NewServer(addr, util.PCF_LOG_PATH, router)
 	if err == nil && server != nil {
-		initLog.Infoln(server.ListenAndServeTLS(pcf_util.PCF_PEM_PATH, pcf_util.PCF_KEY_PATH))
+		initLog.Infoln(server.ListenAndServeTLS(util.PCF_PEM_PATH, util.PCF_KEY_PATH))
 	} else {
 		initLog.Fatalf("Initialize http2 server failed: %+v", err)
 	}

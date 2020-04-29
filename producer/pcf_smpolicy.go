@@ -8,7 +8,7 @@ import (
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,13 +24,13 @@ func CreateSmPolicy(httpChannel chan message.HttpResponseMessage, request models
 	pcfSelf := pcf_context.PCF_Self()
 	ue := pcfSelf.UePool[request.Supi]
 	if ue == nil {
-		rsp := pcf_util.GetProblemDetail("Supi is not supported in PCF", pcf_util.USER_UNKNOWN)
+		rsp := util.GetProblemDetail("Supi is not supported in PCF", util.USER_UNKNOWN)
 		logger.SMpolicylog.Warnf("Supi[%s] is not supported in PCF", request.Supi)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 	}
 	udrUri := getUdrUri(ue)
 	if udrUri == "" {
-		rsp := pcf_util.GetProblemDetail("Can't find corresponding UDR with UE", pcf_util.USER_UNKNOWN)
+		rsp := util.GetProblemDetail("Can't find corresponding UDR with UE", util.USER_UNKNOWN)
 		logger.SMpolicylog.Warnf("Can't find corresponding UDR with UE[%s]", ue.Supi)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -39,15 +39,15 @@ func CreateSmPolicy(httpChannel chan message.HttpResponseMessage, request models
 	smPolicyId := fmt.Sprintf("%s-%d", ue.Supi, request.PduSessionId)
 	smPolicyData := ue.SmPolicyData[smPolicyId]
 	if smPolicyData == nil || smPolicyData.SmPolicyData == nil {
-		client := pcf_util.GetNudrClient(udrUri)
+		client := util.GetNudrClient(udrUri)
 		param := Nudr_DataRepository.PolicyDataUesUeIdSmDataGetParamOpts{
-			Snssai: optional.NewInterface(pcf_util.MarshToJsonString(*request.SliceInfo)),
+			Snssai: optional.NewInterface(util.MarshToJsonString(*request.SliceInfo)),
 			Dnn:    optional.NewString(request.Dnn),
 		}
 		var response *http.Response
 		smData, response, err = client.DefaultApi.PolicyDataUesUeIdSmDataGet(context.Background(), ue.Supi, &param)
 		if err != nil || response == nil || response.StatusCode != http.StatusOK {
-			rsp := pcf_util.GetProblemDetail("Can't find UE SM Policy Data in UDR", pcf_util.USER_UNKNOWN)
+			rsp := util.GetProblemDetail("Can't find UE SM Policy Data in UDR", util.USER_UNKNOWN)
 			logger.SMpolicylog.Warnf("Can't find UE[%s] SM Policy Data in UDR", ue.Supi)
 			message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 			return
@@ -59,7 +59,7 @@ func CreateSmPolicy(httpChannel chan message.HttpResponseMessage, request models
 	}
 	amPolicy := ue.FindAMPolicy(request.AccessType, request.ServingNetwork)
 	if amPolicy == nil {
-		rsp := pcf_util.GetProblemDetail("Can't find corresponding AM Policy", pcf_util.POLICY_CONTEXT_DENIED)
+		rsp := util.GetProblemDetail("Can't find corresponding AM Policy", util.POLICY_CONTEXT_DENIED)
 		logger.SMpolicylog.Warnf("Can't find corresponding AM Policy")
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -98,7 +98,7 @@ func CreateSmPolicy(httpChannel chan message.HttpResponseMessage, request models
 	}
 	decision.SessRules[SessRuleId] = sessRule
 	// TODO: See how UDR used
-	dnnData := pcf_util.GetSMPolicyDnnData(smData, request.SliceInfo, request.Dnn)
+	dnnData := util.GetSMPolicyDnnData(smData, request.SliceInfo, request.Dnn)
 	if dnnData != nil {
 		decision.Online = dnnData.Online
 		decision.Offline = dnnData.Offline
@@ -129,13 +129,13 @@ func CreateSmPolicy(httpChannel chan message.HttpResponseMessage, request models
 		decision.Online = request.Online
 		decision.Offline = request.Offline
 	}
-	decision.SuppFeat = pcf_util.GetNegotiateSuppFeat(request.SuppFeat, pcfSelf.PcfSuppFeats[models.ServiceName_NPCF_SMPOLICYCONTROL])
+	decision.SuppFeat = util.GetNegotiateSuppFeat(request.SuppFeat, pcfSelf.PcfSuppFeats[models.ServiceName_NPCF_SMPOLICYCONTROL])
 	decision.QosFlowUsage = request.QosFlowUsage
 	// TODO: Trigger about UMC, ADC, NetLoc,...
-	decision.PolicyCtrlReqTriggers = pcf_util.PolicyControlReqTrigToArray(0x40780f)
+	decision.PolicyCtrlReqTriggers = util.PolicyControlReqTrigToArray(0x40780f)
 	smPolicyData.PolicyDecision = &decision
 	// TODO: PCC rule, PraInfo ...
-	locationHeader := pcf_util.GetResourceUri(models.ServiceName_NPCF_SMPOLICYCONTROL, smPolicyId)
+	locationHeader := util.GetResourceUri(models.ServiceName_NPCF_SMPOLICYCONTROL, smPolicyId)
 	headers := http.Header{
 		"Location": {locationHeader},
 	}
@@ -149,7 +149,7 @@ func DeleteSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 
 	ue := pcf_context.PCF_Self().PCFUeFindByPolicyId(smPolicyId)
 	if ue == nil || ue.SmPolicyData[smPolicyId] == nil {
-		rsp := pcf_util.GetProblemDetail("smPolicyId not found in PCF", pcf_util.CONTEXT_NOT_FOUND)
+		rsp := util.GetProblemDetail("smPolicyId not found in PCF", util.CONTEXT_NOT_FOUND)
 		logger.SMpolicylog.Warnf(rsp.Detail)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -184,7 +184,7 @@ func GetSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolicyId
 
 	ue := pcf_context.PCF_Self().PCFUeFindByPolicyId(smPolicyId)
 	if ue == nil || ue.SmPolicyData[smPolicyId] == nil {
-		rsp := pcf_util.GetProblemDetail("smPolicyId not found in PCF", pcf_util.CONTEXT_NOT_FOUND)
+		rsp := util.GetProblemDetail("smPolicyId not found in PCF", util.CONTEXT_NOT_FOUND)
 		logger.SMpolicylog.Warnf(rsp.Detail)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -205,7 +205,7 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 
 	ue := pcf_context.PCF_Self().PCFUeFindByPolicyId(smPolicyId)
 	if ue == nil || ue.SmPolicyData[smPolicyId] == nil {
-		rsp := pcf_util.GetProblemDetail("smPolicyId not found in PCF", pcf_util.CONTEXT_NOT_FOUND)
+		rsp := util.GetProblemDetail("smPolicyId not found in PCF", util.CONTEXT_NOT_FOUND)
 		logger.SMpolicylog.Warnf(rsp.Detail)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -249,23 +249,23 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 				}
 				// TODO: Packet Filters are covered by outstanding pcc rule
 				id := smPolicy.PccRuleIdGenarator
-				infos := pcf_util.ConvertPacketInfoToFlowInformation(req.PackFiltInfo)
+				infos := util.ConvertPacketInfoToFlowInformation(req.PackFiltInfo)
 				// Set PackFiltId
 				for i := range infos {
-					infos[i].PackFiltId = pcf_util.GetPackFiltId(smPolicy.PackFiltIdGenarator)
+					infos[i].PackFiltId = util.GetPackFiltId(smPolicy.PackFiltIdGenarator)
 					smPolicy.PackFiltIdGenarator++
 				}
-				pccRule := pcf_util.CreatePccRule(id, req.Precedence, infos, false)
+				pccRule := util.CreatePccRule(id, req.Precedence, infos, false)
 				// Add Traffic control Data
-				tcData := pcf_util.CreateTcData(id, "")
+				tcData := util.CreateTcData(id, "")
 				// TODO: ARP use real Data
-				qosData := pcf_util.CreateQosData(id, int32(req.ReqQos.Var5qi), 15)
+				qosData := util.CreateQosData(id, int32(req.ReqQos.Var5qi), 15)
 				// TODO: Set MBR
 				var err error
 				// Set GBR
 				qosData.GbrDl, qosData.GbrUl, err = smPolicy.DecreaseRemainGBR(req.ReqQos)
 				if err != nil {
-					rsp := pcf_util.GetProblemDetail(err.Error(), pcf_util.ERROR_TRAFFIC_MAPPING_INFO_REJECTED)
+					rsp := util.GetProblemDetail(err.Error(), util.ERROR_TRAFFIC_MAPPING_INFO_REJECTED)
 					logger.SMpolicylog.Warnf(rsp.Detail)
 					message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 					return
@@ -276,7 +276,7 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 				if qosData.GbrUl != "" {
 					logger.SMpolicylog.Tracef("SM Policy Dnn[%s] Data Aggregate decrease %s and then UL GBR remain[%.2f Kbps]", smPolicyContext.Dnn, qosData.GbrUl, *smPolicy.RemainGbrUL)
 				}
-				pcf_util.SetPccRuleRelatedData(smPolicyDecision, pccRule, &tcData, &qosData, nil, nil)
+				util.SetPccRuleRelatedData(smPolicyDecision, pccRule, &tcData, &qosData, nil, nil)
 				// link Packet filters to PccRule
 				for _, info := range infos {
 					smPolicy.PackFiltMapToPccRuleId[info.PackFiltId] = pccRule.PccRuleId
@@ -310,7 +310,7 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 							if err != nil {
 								smPolicy.RemainGbrDL = origDl
 								smPolicy.RemainGbrUL = origUl
-								rsp := pcf_util.GetProblemDetail(err.Error(), pcf_util.ERROR_TRAFFIC_MAPPING_INFO_REJECTED)
+								rsp := util.GetProblemDetail(err.Error(), util.ERROR_TRAFFIC_MAPPING_INFO_REJECTED)
 								logger.SMpolicylog.Warnf(rsp.Detail)
 								message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 								return
@@ -330,12 +330,12 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 							break
 						}
 					}
-					infos := pcf_util.ConvertPacketInfoToFlowInformation(req.PackFiltInfo)
+					infos := util.ConvertPacketInfoToFlowInformation(req.PackFiltInfo)
 					switch req.RuleOp {
 					case models.RuleOperation_MODIFY_PCC_RULE_AND_ADD_PACKET_FILTERS:
 						// Set PackFiltId
 						for i := range infos {
-							infos[i].PackFiltId = pcf_util.GetPackFiltId(smPolicy.PackFiltIdGenarator)
+							infos[i].PackFiltId = util.GetPackFiltId(smPolicy.PackFiltIdGenarator)
 							smPolicy.PackFiltMapToPccRuleId[infos[i].PackFiltId] = req.PccRuleId
 							smPolicy.PackFiltIdGenarator++
 						}
@@ -347,7 +347,7 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 						}
 						// Set PackFiltId
 						for i := range infos {
-							infos[i].PackFiltId = pcf_util.GetPackFiltId(smPolicy.PackFiltIdGenarator)
+							infos[i].PackFiltId = util.GetPackFiltId(smPolicy.PackFiltIdGenarator)
 							smPolicy.PackFiltMapToPccRuleId[infos[i].PackFiltId] = req.PccRuleId
 							smPolicy.PackFiltIdGenarator++
 						}
@@ -551,7 +551,7 @@ func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolic
 	}
 
 	if errCause != "" {
-		rsp := pcf_util.GetProblemDetail(errCause, pcf_util.ERROR_TRIGGER_EVENT)
+		rsp := util.GetProblemDetail(errCause, util.ERROR_TRIGGER_EVENT)
 		logger.SMpolicylog.Warnf(errCause)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -729,7 +729,7 @@ func SendSMPolicyUpdateNotification(ue *pcf_context.UeContext, smPolId string, r
 		logger.SMpolicylog.Warnf("SM Policy Update Notification Error[Can't find smPolId[%s] in UE(%s)]", smPolId, ue.Supi)
 		return
 	}
-	client := pcf_util.GetNpcfSMPolicyCallbackClient()
+	client := util.GetNpcfSMPolicyCallbackClient()
 	uri := smPolicyData.PolicyContext.NotificationUri
 	if uri != "" {
 		_, httpResponse, err := client.DefaultCallbackApi.SmPolicyUpdateNotification(context.Background(), uri, request)
@@ -764,7 +764,7 @@ func SendSMPolicyTerminationRequestNotification(ue *pcf_context.UeContext, smPol
 		logger.SMpolicylog.Warnf("SM Policy Update Notification Error[Can't find smPolId[%s] in UE(%s)]", smPolId, ue.Supi)
 		return
 	}
-	client := pcf_util.GetNpcfSMPolicyCallbackClient()
+	client := util.GetNpcfSMPolicyCallbackClient()
 	uri := smPolicyData.PolicyContext.NotificationUri
 	if uri != "" {
 		rsp, err := client.DefaultCallbackApi.SmPolicyControlTerminationRequestNotification(context.Background(), uri, request)

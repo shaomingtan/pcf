@@ -14,7 +14,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,13 +25,13 @@ func SmPoliciesPost(c *gin.Context) {
 	var smPolicyContextData models.SmPolicyContextData
 	err := c.ShouldBindJSON(&smPolicyContextData)
 	if err != nil {
-		rsp := pcf_util.GetProblemDetail("Malformed request syntax", pcf_util.ERROR_INITIAL_PARAMETERS)
+		rsp := util.GetProblemDetail("Malformed request syntax", util.ERROR_INITIAL_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return
 	}
 	if smPolicyContextData.Supi == "" || smPolicyContextData.SliceInfo == nil || len(smPolicyContextData.SliceInfo.Sd) != 6 {
-		rsp := pcf_util.GetProblemDetail("Errorneous/Missing Mandotory IE", pcf_util.ERROR_INITIAL_PARAMETERS)
+		rsp := util.GetProblemDetail("Errorneous/Missing Mandotory IE", util.ERROR_INITIAL_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return

@@ -10,7 +10,7 @@ import (
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 	"github.com/google/uuid"
 	"github.com/mohae/deepcopy"
 	"net/http"
@@ -25,7 +25,7 @@ func GetBDTPolicyContext(httpChannel chan message.HttpResponseMessage, bdtPolicy
 	bdtPolicy, exist := pcf_context.PCF_Self().BdtPolicyPool[bdtPolicyId]
 	if !exist {
 		// not found
-		rsp := pcf_util.GetProblemDetail("Can't find BDTPolicyId related resource", pcf_util.CONTEXT_NOT_FOUND)
+		rsp := util.GetProblemDetail("Can't find BDTPolicyId related resource", util.CONTEXT_NOT_FOUND)
 		logger.Bdtpolicylog.Warnf(rsp.Detail)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -43,7 +43,7 @@ func UpdateBDTPolicyContext(httpChannel chan message.HttpResponseMessage, bdtPol
 	bdtPolicy, exist := pcfSelf.BdtPolicyPool[bdtPolicyId]
 	if !exist {
 		// not found
-		rsp := pcf_util.GetProblemDetail("Can't find BDTPolicyId related resource", pcf_util.CONTEXT_NOT_FOUND)
+		rsp := util.GetProblemDetail("Can't find BDTPolicyId related resource", util.CONTEXT_NOT_FOUND)
 		logger.Bdtpolicylog.Warnf(rsp.Detail)
 		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
@@ -64,7 +64,7 @@ func UpdateBDTPolicyContext(httpChannel chan message.HttpResponseMessage, bdtPol
 			param := Nudr_DataRepository.PolicyDataBdtDataBdtReferenceIdPutParamOpts{
 				BdtData: optional.NewInterface(bdtData),
 			}
-			client := pcf_util.GetNudrClient(getDefaultUdrUri(pcfSelf))
+			client := util.GetNudrClient(getDefaultUdrUri(pcfSelf))
 			_, err := client.DefaultApi.PolicyDataBdtDataBdtReferenceIdPut(context.Background(), bdtData.BdtRefId, &param)
 			if err != nil {
 				logger.Bdtpolicylog.Warnf("UDR Put BdtDate error[%s]", err.Error())
@@ -74,7 +74,7 @@ func UpdateBDTPolicyContext(httpChannel chan message.HttpResponseMessage, bdtPol
 			return
 		}
 	}
-	rsp := pcf_util.GetProblemDetail(fmt.Sprintf("Can't find TransPolicyId[%d] in TransfPolicies with BDTPolicyId[%s]", request.SelTransPolicyId, bdtPolicyId), pcf_util.CONTEXT_NOT_FOUND)
+	rsp := util.GetProblemDetail(fmt.Sprintf("Can't find TransPolicyId[%d] in TransfPolicies with BDTPolicyId[%s]", request.SelTransPolicyId, bdtPolicyId), util.CONTEXT_NOT_FOUND)
 	logger.Bdtpolicylog.Warnf(rsp.Detail)
 	message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 }
@@ -100,7 +100,7 @@ func CreateBDTPolicyContext(httpChannel chan message.HttpResponseMessage, reques
 	pcfSelf.DefaultUdrUri = udrUri
 
 	// Query BDT DATA array from UDR
-	client := pcf_util.GetNudrClient(udrUri)
+	client := util.GetNudrClient(udrUri)
 	bdtDatas, response, err := client.DefaultApi.PolicyDataBdtDataGet(context.Background())
 	if err != nil || response == nil || response.StatusCode != http.StatusOK {
 		rsp := models.ProblemDetails{
@@ -146,7 +146,7 @@ func CreateBDTPolicyContext(httpChannel chan message.HttpResponseMessage, reques
 	bdtPolicyId := pcfSelf.AllocBdtPolicyId()
 	pcfSelf.BdtPolicyPool[bdtPolicyId] = rsp
 
-	locationHeader := pcf_util.GetResourceUri(models.ServiceName_NPCF_BDTPOLICYCONTROL, bdtPolicyId)
+	locationHeader := util.GetResourceUri(models.ServiceName_NPCF_BDTPOLICYCONTROL, bdtPolicyId)
 	headers := http.Header{
 		"Location": {locationHeader},
 	}
@@ -175,7 +175,7 @@ func getDefaultUdrUri(context *pcf_context.PCFContext) string {
 		return ""
 	}
 	for _, nfProfile := range resp.NfInstances {
-		udruri := pcf_util.SearchNFServiceUri(nfProfile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+		udruri := util.SearchNFServiceUri(nfProfile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 		if udruri != "" {
 			return udruri
 		}

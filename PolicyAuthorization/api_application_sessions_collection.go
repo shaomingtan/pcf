@@ -14,7 +14,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +24,7 @@ func PostAppSessions(c *gin.Context) {
 	var appSessionContext models.AppSessionContext
 	err := c.ShouldBindJSON(&appSessionContext)
 	if err != nil {
-		rsp := pcf_util.GetProblemDetail("Malformed request syntax", pcf_util.ERROR_INITIAL_PARAMETERS)
+		rsp := util.GetProblemDetail("Malformed request syntax", util.ERROR_INITIAL_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return
@@ -32,7 +32,7 @@ func PostAppSessions(c *gin.Context) {
 	reqData := appSessionContext.AscReqData
 	if reqData == nil || reqData.SuppFeat == "" || reqData.NotifUri == "" {
 		// Check Mandatory IEs
-		rsp := pcf_util.GetProblemDetail("Errorneous/Missing Mandotory IE", pcf_util.ERROR_INITIAL_PARAMETERS)
+		rsp := util.GetProblemDetail("Errorneous/Missing Mandotory IE", util.ERROR_INITIAL_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return

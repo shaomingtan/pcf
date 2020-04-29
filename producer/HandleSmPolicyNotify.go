@@ -6,7 +6,7 @@ import (
 	"free5gc/lib/openapi/models"
 	// pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/handler/message"
-	// "free5gc/src/pcf/pcf_util"
+	// "free5gc/src/pcf/util"
 	// "github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ func HandleSmPolicyNotify(httpChannel chan message.HttpResponseMessage, supi str
 	// 	var smPolicyDecision models.SmPolicyDecision
 	// 	pcfUeContext := pcf_context.PCF_Self().UePool
 	// 	counter := false
-	// 	client := pcf_util.GetNudrClient("https://localhost:29504")
+	// 	client := util.GetNudrClient("https://localhost:29504")
 	// 	UeContext := pcf_context.PCF_Self().UePool
 	// 	if UeContext[supi] == nil {
 	// 		problem.Status = 404

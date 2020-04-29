@@ -7,7 +7,7 @@ import (
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 	"github.com/antihax/optional"
 	"net/http"
 )
@@ -48,7 +48,7 @@ func SendNFIntancesUDR(nrfUri, id string) string {
 		return ""
 	}
 	for _, profile := range result.NfInstances {
-		if uri := pcf_util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED); uri != "" {
+		if uri := util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED); uri != "" {
 			return uri
 		}
 	}
@@ -60,7 +60,7 @@ func SendNFIntancesAMF(nrfUri string, guami models.Guami, serviceName models.Ser
 	requestNfType := models.NfType_PCF
 
 	localVarOptionals := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
-		Guami: optional.NewInterface(pcf_util.MarshToJsonString(guami)),
+		Guami: optional.NewInterface(util.MarshToJsonString(guami)),
 	}
 	// switch types {
 	// case NFDiscoveryToUDRParamSupi:
@@ -77,7 +77,7 @@ func SendNFIntancesAMF(nrfUri string, guami models.Guami, serviceName models.Ser
 		return ""
 	}
 	for _, profile := range result.NfInstances {
-		return pcf_util.SearchNFServiceUri(profile, serviceName, models.NfServiceStatus_REGISTERED)
+		return util.SearchNFServiceUri(profile, serviceName, models.NfServiceStatus_REGISTERED)
 	}
 	return ""
 }
@@ -92,7 +92,7 @@ func SearchAvailableAMFs(nrfUri string, serviceName models.ServiceName) (amfInfo
 	}
 
 	for _, profile := range result.NfInstances {
-		uri := pcf_util.SearchNFServiceUri(profile, serviceName, models.NfServiceStatus_REGISTERED)
+		uri := util.SearchNFServiceUri(profile, serviceName, models.NfServiceStatus_REGISTERED)
 		if uri != "" {
 			item := pcf_context.AMFStatusSubscriptionData{
 				AmfUri:    uri,

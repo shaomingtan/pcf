@@ -14,7 +14,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +48,7 @@ func PoliciesPolAssoIdUpdatePost(c *gin.Context) {
 	var policyAssociationUpdateRequest models.PolicyAssociationUpdateRequest
 	err := c.ShouldBindJSON(&policyAssociationUpdateRequest)
 	if err != nil {
-		rsp := pcf_util.GetProblemDetail("Malformed request syntax", pcf_util.ERROR_REQUEST_PARAMETERS)
+		rsp := util.GetProblemDetail("Malformed request syntax", util.ERROR_REQUEST_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return
@@ -68,13 +68,13 @@ func PoliciesPost(c *gin.Context) {
 	var policyAssociationRequest models.PolicyAssociationRequest
 	err := c.ShouldBindJSON(&policyAssociationRequest)
 	if err != nil {
-		rsp := pcf_util.GetProblemDetail("Malformed request syntax", pcf_util.ERROR_REQUEST_PARAMETERS)
+		rsp := util.GetProblemDetail("Malformed request syntax", util.ERROR_REQUEST_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return
 	}
 	if policyAssociationRequest.Supi == "" || policyAssociationRequest.NotificationUri == "" {
-		rsp := pcf_util.GetProblemDetail("Miss Mandotory IE", pcf_util.ERROR_REQUEST_PARAMETERS)
+		rsp := util.GetProblemDetail("Miss Mandotory IE", util.ERROR_REQUEST_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return

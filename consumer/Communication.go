@@ -7,14 +7,14 @@ import (
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 	"strings"
 )
 
 func AmfStatusChangeSubscribe(amfInfo pcf_context.AMFStatusSubscriptionData) (problemDetails *models.ProblemDetails, err error) {
 	logger.Consumerlog.Debugf("PCF Subscribe to AMF status[%+v]", amfInfo.AmfUri)
 	pcfSelf := pcf_context.PCF_Self()
-	client := pcf_util.GetNamfClient(amfInfo.AmfUri)
+	client := util.GetNamfClient(amfInfo.AmfUri)
 
 	subscriptionData := models.SubscriptionData{
 		AmfStatusUri: fmt.Sprintf("%s/npcf-callback/v1/amfstatus", pcfSelf.GetIPv4Uri()),

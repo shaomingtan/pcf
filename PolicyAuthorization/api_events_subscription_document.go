@@ -14,7 +14,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
-	"free5gc/src/pcf/pcf_util"
+	"free5gc/src/pcf/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,13 +38,13 @@ func UpdateEventsSubsc(c *gin.Context) {
 	var eventsSubscReqData models.EventsSubscReqData
 	err := c.ShouldBindJSON(&eventsSubscReqData)
 	if err != nil {
-		rsp := pcf_util.GetProblemDetail("Malformed request syntax", pcf_util.ERROR_REQUEST_PARAMETERS)
+		rsp := util.GetProblemDetail("Malformed request syntax", util.ERROR_REQUEST_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return
 	}
 	if eventsSubscReqData.Events == nil || eventsSubscReqData.NotifUri == "" {
-		rsp := pcf_util.GetProblemDetail("Errorneous/Missing Mandotory IE", pcf_util.ERROR_REQUEST_PARAMETERS)
+		rsp := util.GetProblemDetail("Errorneous/Missing Mandotory IE", util.ERROR_REQUEST_PARAMETERS)
 		logger.HandlerLog.Errorln(rsp.Detail)
 		c.JSON(int(rsp.Status), rsp)
 		return
