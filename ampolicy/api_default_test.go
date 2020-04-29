@@ -1,12 +1,10 @@
-package AMPolicy_test
+package ampolicy_test
 
 import (
 	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"free5gc/lib/CommonConsumerTestData/PCF/TestAMPolicy"
 	"free5gc/lib/MongoDBLibrary"
 	"free5gc/lib/Npcf_AMPolicy"
@@ -22,6 +20,8 @@ import (
 	"free5gc/src/pcf/pcf_producer"
 	"free5gc/src/pcf/pcf_service"
 	"free5gc/src/udr/udr_service"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"strings"
 	"testing"
