@@ -3,7 +3,7 @@ package oam
 import (
 	"github.com/gin-gonic/gin"
 	"free5gc/lib/http_wrapper"
-	"free5gc/src/pcf/pcf_handler/pcf_message"
+	"free5gc/src/pcf/handler/pcf_message"
 )
 
 func setCorsHeader(c *gin.Context) {

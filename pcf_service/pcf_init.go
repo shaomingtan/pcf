@@ -18,7 +18,7 @@ import (
 	"free5gc/src/pcf/oam"
 	"free5gc/src/pcf/consumer"
 	"free5gc/src/pcf/context"
-	"free5gc/src/pcf/pcf_handler"
+	"free5gc/src/pcf/handler"
 	"free5gc/src/pcf/pcf_util"
 	"github.com/gin-contrib/cors"
 	"os/exec"
@@ -153,7 +153,7 @@ func (pcf *PCF) Start() {
 
 	// TODO: subscribe NRF NFstatus
 
-	go pcf_handler.Handle()
+	go handler.Handle()
 	param := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
 		ServiceNames: optional.NewInterface([]models.ServiceName{models.ServiceName_NUDR_DR}),
 	}

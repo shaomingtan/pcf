@@ -9,7 +9,7 @@ import (
 	"free5gc/src/pcf/consumer"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_handler/pcf_message"
+	"free5gc/src/pcf/handler/pcf_message"
 	"free5gc/src/pcf/pcf_util"
 	"github.com/google/uuid"
 	"github.com/mohae/deepcopy"

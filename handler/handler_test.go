@@ -1,4 +1,4 @@
-package pcf_handler_test
+package handler_test
 
 import (
 	// "free5gc/lib/CommonConsumerTestData/AMF/TestAmf"

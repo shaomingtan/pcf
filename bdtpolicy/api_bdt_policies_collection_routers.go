@@ -12,7 +12,7 @@ package bdtpolicy
 import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/pcf_handler/pcf_message"
+	"free5gc/src/pcf/handler/pcf_message"
 
 	"github.com/gin-gonic/gin"
 )
