@@ -1,4 +1,4 @@
-package pcf_context
+package context
 
 import (
 	"fmt"

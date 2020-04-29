@@ -3,7 +3,7 @@ package pcf_producer
 import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/context"
 	"free5gc/src/pcf/pcf_handler/pcf_message"
 	"net/http"
 	"strconv"
@@ -26,7 +26,7 @@ func HandleOAMGetAmPolicy(httpChannel chan pcf_message.HttpResponseMessage, supi
 	logger.OamLog.Infof("Handle OAM Get Am Policy")
 
 	var response UEAmPolicys
-	pcfSelf := pcf_context.PCF_Self()
+	pcfSelf := context.PCF_Self()
 
 	if ue, exists := pcfSelf.UePool[supi]; exists {
 		for _, amPolicy := range ue.AMPolicyData {

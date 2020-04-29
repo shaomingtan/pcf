@@ -3,12 +3,12 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"github.com/antihax/optional"
 	"free5gc/lib/Nnrf_NFDiscovery"
 	"free5gc/lib/openapi/models"
+	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_context"
 	"free5gc/src/pcf/pcf_util"
+	"github.com/antihax/optional"
 	"net/http"
 )
 

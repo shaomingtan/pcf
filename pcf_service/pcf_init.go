@@ -17,7 +17,7 @@ import (
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/oam"
 	"free5gc/src/pcf/consumer"
-	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/context"
 	"free5gc/src/pcf/pcf_handler"
 	"free5gc/src/pcf/pcf_util"
 	"github.com/gin-contrib/cors"
@@ -122,7 +122,7 @@ func (pcf *PCF) Start() {
 		MaxAge:           86400,
 	}))
 
-	self := pcf_context.PCF_Self()
+	self := context.PCF_Self()
 	pcf_util.InitpcfContext(self)
 
 	addr := fmt.Sprintf("%s:%d", self.HttpIPv4Address, self.HttpIpv4Port)

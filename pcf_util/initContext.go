@@ -5,13 +5,13 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/factory"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/context"
 
 	"github.com/google/uuid"
 )
 
 // Init PCF Context from config flie
-func InitpcfContext(context *pcf_context.PCFContext) {
+func InitpcfContext(context *context.PCFContext) {
 	config := factory.PcfConfig
 	logger.UtilLog.Infof("pcfconfig Info: Version[%s] Description[%s]", config.Info.Version, config.Info.Description)
 	configuration := config.Configuration

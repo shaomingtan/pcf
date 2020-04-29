@@ -4,7 +4,7 @@ import (
 	// "context"
 	// "fmt"
 	"free5gc/lib/openapi/models"
-	// "free5gc/src/pcf/pcf_context"
+	// pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/pcf_handler/pcf_message"
 	// "free5gc/src/pcf/pcf_util"
 	// "github.com/gin-gonic/gin"

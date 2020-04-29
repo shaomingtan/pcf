@@ -11,7 +11,7 @@ import (
 	"free5gc/lib/Nudr_DataRepository"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
-	"free5gc/src/pcf/pcf_context"
+	"free5gc/src/pcf/context"
 	"net/http"
 	"reflect"
 	"time"
@@ -199,7 +199,7 @@ var serviceUriMap = map[models.ServiceName]string{
 
 // Get Resource Uri (location Header) with param id string
 func GetResourceUri(name models.ServiceName, id string) string {
-	return fmt.Sprintf("%s/%s/%s", pcf_context.GetUri(name), serviceUriMap[name], id)
+	return fmt.Sprintf("%s/%s/%s", context.GetUri(name), serviceUriMap[name], id)
 }
 
 // Check if Feature is Supported or not
@@ -238,7 +238,7 @@ func GetNotSubscribedGuamis(guamisIn []models.Guami) (guamisOut []models.Guami) 
 }
 
 func guamiInSubscriptionData(guami models.Guami) bool {
-	pcfSelf := pcf_context.PCF_Self()
+	pcfSelf := context.PCF_Self()
 	for _, subscriptionData := range pcfSelf.AMFStatusSubsData {
 		for _, sGuami := range subscriptionData.GuamiList {
 			if reflect.DeepEqual(sGuami, guami) {

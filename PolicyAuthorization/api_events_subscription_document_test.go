@@ -10,7 +10,7 @@ import (
 	"free5gc/lib/Npcf_AMPolicy"
 	"free5gc/lib/Npcf_PolicyAuthorization"
 	"free5gc/lib/Npcf_SMPolicyControl"
-	"free5gc/src/pcf/pcf_context"
+	pcf_context "free5gc/src/pcf/context"
 	"net/http"
 	"strings"
 	"testing"

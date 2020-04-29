@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"free5gc/lib/openapi/common"
 	"free5gc/lib/openapi/models"
+	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/pcf_context"
 	"free5gc/src/pcf/pcf_util"
 	"strings"
 )
