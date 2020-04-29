@@ -10,7 +10,7 @@ import (
 	"free5gc/src/app"
 	"free5gc/src/pcf/policyauthorization"
 	"free5gc/src/pcf/smpolicy"
-	"free5gc/src/pcf/UEPolicy"
+	"free5gc/src/pcf/uepolicy"
 	"free5gc/src/pcf/ampolicy"
 	"free5gc/src/pcf/bdtpolicy"
 	"free5gc/src/pcf/httpcallback"
@@ -108,7 +108,7 @@ func (pcf *PCF) Start() {
 	bdtpolicy.AddService(router)
 	smpolicy.AddService(router)
 	ampolicy.AddService(router)
-	UEPolicy.AddService(router)
+	uepolicy.AddService(router)
 	policyauthorization.AddService(router)
 	httpcallback.AddService(router)
 	oam.AddService(router)
