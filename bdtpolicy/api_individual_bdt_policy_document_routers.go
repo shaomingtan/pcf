@@ -12,7 +12,7 @@ package bdtpolicy
 import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,9 +21,9 @@ import (
 func GetBDTPolicy(c *gin.Context) {
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["bdtPolicyId"] = c.Params.ByName("bdtPolicyId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventBDTPolicyGet, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventBDTPolicyGet, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)
@@ -36,9 +36,9 @@ func UpdateBDTPolicy(c *gin.Context) {
 
 	req := http_wrapper.NewRequest(c.Request, bdtPolicyDataPatch)
 	req.Params["bdtPolicyId"] = c.Params.ByName("bdtPolicyId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventBDTPolicyUpdate, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventBDTPolicyUpdate, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)

@@ -12,7 +12,7 @@ package SMPolicy
 import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/pcf_util"
 
@@ -38,9 +38,9 @@ func SmPoliciesPost(c *gin.Context) {
 	}
 
 	req := http_wrapper.NewRequest(c.Request, smPolicyContextData)
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventSMPolicyCreate, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventSMPolicyCreate, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 
@@ -54,8 +54,8 @@ func SmPoliciesPost(c *gin.Context) {
 func SmPoliciesSmPolicyIdDeletePost(c *gin.Context) {
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["smPolicyId"] = c.Params.ByName("smPolicyId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventSMPolicyDelete, req)
-	pcf_message.SendMessage(channelMsg)
+	channelMsg := message.NewHttpChannelMessage(message.EventSMPolicyDelete, req)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)
@@ -65,9 +65,9 @@ func SmPoliciesSmPolicyIdDeletePost(c *gin.Context) {
 func SmPoliciesSmPolicyIdGet(c *gin.Context) {
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["smPolicyId"] = c.Params.ByName("smPolicyId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventSMPolicyGet, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventSMPolicyGet, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)
@@ -79,9 +79,9 @@ func SmPoliciesSmPolicyIdUpdatePost(c *gin.Context) {
 	c.ShouldBindJSON(&smPolicyUpdateContextData)
 	req := http_wrapper.NewRequest(c.Request, smPolicyUpdateContextData)
 	req.Params["smPolicyId"] = c.Params.ByName("smPolicyId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventSMPolicyUpdate, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventSMPolicyUpdate, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)

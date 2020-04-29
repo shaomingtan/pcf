@@ -7,7 +7,7 @@ import (
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/pcf_util"
 	"net/http"
 	"strconv"
@@ -17,7 +17,7 @@ import (
 )
 
 // SmPoliciesPost -
-func CreateSmPolicy(httpChannel chan pcf_message.HttpResponseMessage, request models.SmPolicyContextData) {
+func CreateSmPolicy(httpChannel chan message.HttpResponseMessage, request models.SmPolicyContextData) {
 	var err error
 
 	logger.SMpolicylog.Tracef("Handle Create SM Policy Request")
@@ -26,13 +26,13 @@ func CreateSmPolicy(httpChannel chan pcf_message.HttpResponseMessage, request mo
 	if ue == nil {
 		rsp := pcf_util.GetProblemDetail("Supi is not supported in PCF", pcf_util.USER_UNKNOWN)
 		logger.SMpolicylog.Warnf("Supi[%s] is not supported in PCF", request.Supi)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 	}
 	udrUri := getUdrUri(ue)
 	if udrUri == "" {
 		rsp := pcf_util.GetProblemDetail("Can't find corresponding UDR with UE", pcf_util.USER_UNKNOWN)
 		logger.SMpolicylog.Warnf("Can't find corresponding UDR with UE[%s]", ue.Supi)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
 	}
 	var smData models.SmPolicyData
@@ -49,7 +49,7 @@ func CreateSmPolicy(httpChannel chan pcf_message.HttpResponseMessage, request mo
 		if err != nil || response == nil || response.StatusCode != http.StatusOK {
 			rsp := pcf_util.GetProblemDetail("Can't find UE SM Policy Data in UDR", pcf_util.USER_UNKNOWN)
 			logger.SMpolicylog.Warnf("Can't find UE[%s] SM Policy Data in UDR", ue.Supi)
-			pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+			message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 			return
 			// logger.SMpolicylog.Warnln("Nudr Query failed [%s]", err.Error())
 		}
@@ -61,7 +61,7 @@ func CreateSmPolicy(httpChannel chan pcf_message.HttpResponseMessage, request mo
 	if amPolicy == nil {
 		rsp := pcf_util.GetProblemDetail("Can't find corresponding AM Policy", pcf_util.POLICY_CONTEXT_DENIED)
 		logger.SMpolicylog.Warnf("Can't find corresponding AM Policy")
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
 	}
 	// TODO: check service restrict
@@ -140,18 +140,18 @@ func CreateSmPolicy(httpChannel chan pcf_message.HttpResponseMessage, request mo
 		"Location": {locationHeader},
 	}
 	logger.SMpolicylog.Tracef("SMPolicy PduSessionId[%d] Create", request.PduSessionId)
-	pcf_message.SendHttpResponseMessage(httpChannel, headers, 201, decision)
+	message.SendHttpResponseMessage(httpChannel, headers, 201, decision)
 }
 
 // SmPoliciesSmPolicyIdDeletePost -
-func DeleteSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smPolicyId string) {
+func DeleteSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolicyId string) {
 	logger.AMpolicylog.Traceln("Handle SM Policy Delete")
 
 	ue := pcf_context.PCF_Self().PCFUeFindByPolicyId(smPolicyId)
 	if ue == nil || ue.SmPolicyData[smPolicyId] == nil {
 		rsp := pcf_util.GetProblemDetail("smPolicyId not found in PCF", pcf_util.CONTEXT_NOT_FOUND)
 		logger.SMpolicylog.Warnf(rsp.Detail)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
 	}
 
@@ -161,7 +161,7 @@ func DeleteSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smP
 	// Unsubscrice UDR
 	delete(ue.SmPolicyData, smPolicyId)
 	logger.SMpolicylog.Tracef("SMPolicy SmPolicyId[%s] DELETE", smPolicyId)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, nil)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, nil)
 
 	// Release related App Session
 	terminationInfo := models.TerminationInfo{
@@ -179,14 +179,14 @@ func DeleteSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smP
 }
 
 // SmPoliciesSmPolicyIdGet -
-func GetSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smPolicyId string) {
+func GetSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolicyId string) {
 	logger.SMpolicylog.Traceln("Handle GET SM Policy Request")
 
 	ue := pcf_context.PCF_Self().PCFUeFindByPolicyId(smPolicyId)
 	if ue == nil || ue.SmPolicyData[smPolicyId] == nil {
 		rsp := pcf_util.GetProblemDetail("smPolicyId not found in PCF", pcf_util.CONTEXT_NOT_FOUND)
 		logger.SMpolicylog.Warnf(rsp.Detail)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
 	}
 	smPolicyData := ue.SmPolicyData[smPolicyId]
@@ -195,11 +195,11 @@ func GetSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smPoli
 		Context: smPolicyData.PolicyContext,
 	}
 	logger.SMpolicylog.Tracef("SMPolicy SmPolicyId[%s] GET", smPolicyId)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, rsp)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, rsp)
 }
 
 // SmPoliciesSmPolicyIdUpdatePost -
-func UpdateSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smPolicyId string, request models.SmPolicyUpdateContextData) {
+func UpdateSmPolicyContext(httpChannel chan message.HttpResponseMessage, smPolicyId string, request models.SmPolicyUpdateContextData) {
 
 	logger.SMpolicylog.Traceln("Handle SM Policy Update")
 
@@ -207,7 +207,7 @@ func UpdateSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smP
 	if ue == nil || ue.SmPolicyData[smPolicyId] == nil {
 		rsp := pcf_util.GetProblemDetail("smPolicyId not found in PCF", pcf_util.CONTEXT_NOT_FOUND)
 		logger.SMpolicylog.Warnf(rsp.Detail)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
 	}
 	smPolicy := ue.SmPolicyData[smPolicyId]
@@ -267,7 +267,7 @@ func UpdateSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smP
 				if err != nil {
 					rsp := pcf_util.GetProblemDetail(err.Error(), pcf_util.ERROR_TRAFFIC_MAPPING_INFO_REJECTED)
 					logger.SMpolicylog.Warnf(rsp.Detail)
-					pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+					message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 					return
 				}
 				if qosData.GbrDl != "" {
@@ -312,7 +312,7 @@ func UpdateSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smP
 								smPolicy.RemainGbrUL = origUl
 								rsp := pcf_util.GetProblemDetail(err.Error(), pcf_util.ERROR_TRAFFIC_MAPPING_INFO_REJECTED)
 								logger.SMpolicylog.Warnf(rsp.Detail)
-								pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+								message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 								return
 							}
 							qosData.Var5qi = req.ReqQos.Var5qi
@@ -553,11 +553,11 @@ func UpdateSmPolicyContext(httpChannel chan pcf_message.HttpResponseMessage, smP
 	if errCause != "" {
 		rsp := pcf_util.GetProblemDetail(errCause, pcf_util.ERROR_TRIGGER_EVENT)
 		logger.SMpolicylog.Warnf(errCause)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+		message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 		return
 	}
 	logger.SMpolicylog.Tracef("SMPolicy SmPolicyId[%s] Update", smPolicyId)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *smPolicyDecision)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *smPolicyDecision)
 
 }
 

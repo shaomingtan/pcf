@@ -6,7 +6,7 @@ import (
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/pcf_util"
 	"net/http"
 	"strings"
@@ -25,7 +25,7 @@ import (
 // Invocation of Multimedia Priority Services (TODO)
 // Support of content versioning (TODO)
 // PostAppSessions - Creates a new Individual Application Session Context resource
-func PostAppSessionsContext(httpChannel chan pcf_message.HttpResponseMessage, request models.AppSessionContext) {
+func PostAppSessionsContext(httpChannel chan message.HttpResponseMessage, request models.AppSessionContext) {
 	logger.PolicyAuthorizationlog.Traceln("Handle Create AppSessions")
 	reqData := request.AscReqData
 	pcfSelf := pcf_context.PCF_Self()
@@ -47,7 +47,7 @@ func PostAppSessionsContext(httpChannel chan pcf_message.HttpResponseMessage, re
 			"Location": {locationHeader},
 		}
 		logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Create", appSessionId)
-		pcf_message.SendHttpResponseMessage(httpChannel, headers, http.StatusCreated, request)
+		message.SendHttpResponseMessage(httpChannel, headers, http.StatusCreated, request)
 		return
 	}
 	if request.AscReqData.UeIpv4 == "" && request.AscReqData.UeIpv6 == "" && request.AscReqData.UeMac == "" {
@@ -370,7 +370,7 @@ func PostAppSessionsContext(httpChannel chan pcf_message.HttpResponseMessage, re
 		"Location": {locationHeader},
 	}
 	logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Create", appSessionId)
-	pcf_message.SendHttpResponseMessage(httpChannel, headers, http.StatusCreated, request)
+	message.SendHttpResponseMessage(httpChannel, headers, http.StatusCreated, request)
 	// Send Notification to SMF
 	if updateSMpolicy {
 		smPolicyId := fmt.Sprintf("%s-%d", ue.Supi, smPolicy.PolicyContext.PduSessionId)
@@ -384,7 +384,7 @@ func PostAppSessionsContext(httpChannel chan pcf_message.HttpResponseMessage, re
 }
 
 // DeleteAppSession - Deletes an existing Individual Application Session Context
-func DeleteAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appSessionId string, requset *models.EventsSubscReqData) {
+func DeleteAppSessionContext(httpChannel chan message.HttpResponseMessage, appSessionId string, requset *models.EventsSubscReqData) {
 
 	logger.PolicyAuthorizationlog.Tracef("Handle Del AppSessions, AppSessionId[%s]", appSessionId)
 	pcfSelf := pcf_context.PCF_Self()
@@ -418,10 +418,10 @@ func DeleteAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, a
 	// 			UsgRep: appSession.AccUsage,
 	// 		},
 	// 	}
-	// 	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, resp)
+	// 	message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, resp)
 	// } else {
 	// }
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, nil)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, nil)
 
 	delete(pcfSelf.AppSessionPool, appSessionId)
 
@@ -439,7 +439,7 @@ func DeleteAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, a
 }
 
 // GetAppSession - Reads an existing Individual Application Session Context
-func GetAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appSessionId string) {
+func GetAppSessionContext(httpChannel chan message.HttpResponseMessage, appSessionId string) {
 	logger.PolicyAuthorizationlog.Tracef("Handle Get AppSessions, AppSessionId[%s]", appSessionId)
 	pcfSelf := pcf_context.PCF_Self()
 
@@ -449,11 +449,11 @@ func GetAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appS
 		return
 	}
 	logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Get", appSessionId)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *appSession.AppSessionContext)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *appSession.AppSessionContext)
 }
 
 // ModAppSession - Modifies an existing Individual Application Session Context
-func ModAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appSessionId string, request models.AppSessionContextUpdateData) {
+func ModAppSessionContext(httpChannel chan message.HttpResponseMessage, appSessionId string, request models.AppSessionContextUpdateData) {
 
 	logger.PolicyAuthorizationlog.Tracef("Handle Modi AppSessions, AppSessionId[%s]", appSessionId)
 	pcfSelf := pcf_context.PCF_Self()
@@ -471,7 +471,7 @@ func ModAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appS
 			return
 		}
 		logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Updated", appSessionId)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *appContext)
+		message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *appContext)
 		return
 
 	}
@@ -758,7 +758,7 @@ func ModAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appS
 
 	// TODO: MPS Sevice
 	logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Updated", appSessionId)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *appContext)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, *appContext)
 
 	smPolicy.ArrangeExistEventSubscription()
 
@@ -776,7 +776,7 @@ func ModAppSessionContext(httpChannel chan pcf_message.HttpResponseMessage, appS
 }
 
 // DeleteEventsSubsc - deletes the Events Subscription subresource
-func DeleteEventsSubscContext(httpChannel chan pcf_message.HttpResponseMessage, appSessionId string) {
+func DeleteEventsSubscContext(httpChannel chan message.HttpResponseMessage, appSessionId string) {
 
 	logger.PolicyAuthorizationlog.Tracef("Handle Del AppSessions Events Subsc, AppSessionId[%s]", appSessionId)
 	pcfSelf := pcf_context.PCF_Self()
@@ -794,7 +794,7 @@ func DeleteEventsSubscContext(httpChannel chan pcf_message.HttpResponseMessage, 
 	changed := appSession.SmPolicyData.ArrangeExistEventSubscription()
 
 	logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Del Events Subsc success", appSessionId)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, nil)
+	message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, nil)
 
 	smPolicy := appSession.SmPolicyData
 	// Send Notification to SMF
@@ -810,7 +810,7 @@ func DeleteEventsSubscContext(httpChannel chan pcf_message.HttpResponseMessage, 
 }
 
 // UpdateEventsSubsc - creates or modifies an Events Subscription subresource
-func UpdateEventsSubscContext(httpChannel chan pcf_message.HttpResponseMessage, appSessionId string, request models.EventsSubscReqData) {
+func UpdateEventsSubscContext(httpChannel chan message.HttpResponseMessage, appSessionId string, request models.EventsSubscReqData) {
 
 	logger.PolicyAuthorizationlog.Tracef("Handle Put AppSessions Events Subsc, AppSessionId[%s]", appSessionId)
 	pcfSelf := pcf_context.PCF_Self()
@@ -925,13 +925,13 @@ func UpdateEventsSubscContext(httpChannel chan pcf_message.HttpResponseMessage, 
 			"Location": {locationHeader},
 		}
 		logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Create Subscription", appSessionId)
-		pcf_message.SendHttpResponseMessage(httpChannel, headers, http.StatusCreated, resp)
+		message.SendHttpResponseMessage(httpChannel, headers, http.StatusCreated, resp)
 	} else if resp.EvsNotif != nil {
 		logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Modify Subscription", appSessionId)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, resp)
+		message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, resp)
 	} else {
 		logger.PolicyAuthorizationlog.Tracef("App Session Id[%s] Modify Subscription", appSessionId)
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, resp)
+		message.SendHttpResponseMessage(httpChannel, nil, http.StatusNoContent, resp)
 	}
 
 	changed := appSession.SmPolicyData.ArrangeExistEventSubscription()
@@ -1481,7 +1481,7 @@ func extractUmData(umId string, eventSubs map[models.AfEvent]models.AfNotifMetho
 	return
 }
 
-func modifyRemainBitRate(httpChannel chan pcf_message.HttpResponseMessage, smPolicy *pcf_context.UeSmPolicyData, qosData *models.QosData, ulExist, dlExist bool) (err error) {
+func modifyRemainBitRate(httpChannel chan message.HttpResponseMessage, smPolicy *pcf_context.UeSmPolicyData, qosData *models.QosData, ulExist, dlExist bool) (err error) {
 	// if request GBR == 0, qos GBR = MBR
 	// if request GBR > remain GBR, qos GBR = remain GBR
 	if ulExist {
@@ -1564,8 +1564,8 @@ func reverseStringMap(srcMap map[string]string) map[string]string {
 	return reverseMap
 }
 
-func sendProblemDetail(httpChannel chan pcf_message.HttpResponseMessage, errDetail, errCause string) {
+func sendProblemDetail(httpChannel chan message.HttpResponseMessage, errDetail, errCause string) {
 	rsp := pcf_util.GetProblemDetail(errDetail, errCause)
 	logger.PolicyAuthorizationlog.Error(rsp.Detail)
-	pcf_message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
+	message.SendHttpResponseMessage(httpChannel, nil, int(rsp.Status), rsp)
 }

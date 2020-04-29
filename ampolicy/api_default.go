@@ -13,7 +13,7 @@ import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/pcf_util"
 
 	"github.com/gin-gonic/gin"
@@ -22,9 +22,9 @@ import (
 func PoliciesPolAssoIdDelete(c *gin.Context) {
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["polAssoId"], _ = c.Params.Get("polAssoId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventAMPolicyDelete, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventAMPolicyDelete, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)
@@ -34,9 +34,9 @@ func PoliciesPolAssoIdDelete(c *gin.Context) {
 func PoliciesPolAssoIdGet(c *gin.Context) {
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["polAssoId"], _ = c.Params.Get("polAssoId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventAMPolicyGet, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventAMPolicyGet, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)
@@ -55,9 +55,9 @@ func PoliciesPolAssoIdUpdatePost(c *gin.Context) {
 	}
 	req := http_wrapper.NewRequest(c.Request, policyAssociationUpdateRequest)
 	req.Params["polAssoId"], _ = c.Params.Get("polAssoId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventAMPolicyUpdate, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventAMPolicyUpdate, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)
@@ -80,9 +80,9 @@ func PoliciesPost(c *gin.Context) {
 		return
 	}
 	req := http_wrapper.NewRequest(c.Request, policyAssociationRequest)
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventAMPolicyCreate, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventAMPolicyCreate, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	for key, val := range HTTPResponse.Header {

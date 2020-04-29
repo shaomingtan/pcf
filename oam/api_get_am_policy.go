@@ -3,7 +3,7 @@ package oam
 import (
 	"github.com/gin-gonic/gin"
 	"free5gc/lib/http_wrapper"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 )
 
 func setCorsHeader(c *gin.Context) {
@@ -19,8 +19,8 @@ func OAMGetAmPolicy(c *gin.Context) {
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["supi"] = c.Params.ByName("supi")
 
-	handlerMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventOAMGetAmPolicy, req)
-	pcf_message.SendMessage(handlerMsg)
+	handlerMsg := message.NewHttpChannelMessage(message.EventOAMGetAmPolicy, req)
+	message.SendMessage(handlerMsg)
 
 	rsp := <-handlerMsg.HttpChannel
 

@@ -4,7 +4,7 @@ import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,9 +18,9 @@ func NudrNotify(c *gin.Context) {
 
 	req := http_wrapper.NewRequest(c.Request, policyDataChangeNotification)
 	req.Params["ReqURI"] = c.Params.ByName("supi")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventSMPolicyNotify, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventSMPolicyNotify, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 	c.JSON(HTTPResponse.Status, HTTPResponse.Body)

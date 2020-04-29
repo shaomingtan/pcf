@@ -1,4 +1,4 @@
-package pcf_message
+package message
 
 import (
 	"sync"

@@ -5,12 +5,12 @@ import (
 	// "fmt"
 	"free5gc/lib/openapi/models"
 	// pcf_context "free5gc/src/pcf/context"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	// "free5gc/src/pcf/pcf_util"
 	// "github.com/gin-gonic/gin"
 )
 
-func HandleSmPolicyNotify(httpChannel chan pcf_message.HttpResponseMessage, supi string, body models.PolicyDataChangeNotification) {
+func HandleSmPolicyNotify(httpChannel chan message.HttpResponseMessage, supi string, body models.PolicyDataChangeNotification) {
 	// 	policyDataChangeNotification := body
 	// 	var problem models.ProblemDetails
 	// 	var smPolicyDecision models.SmPolicyDecision
@@ -21,18 +21,18 @@ func HandleSmPolicyNotify(httpChannel chan pcf_message.HttpResponseMessage, supi
 	// 	if UeContext[supi] == nil {
 	// 		problem.Status = 404
 	// 		problem.Cause = "CONTEXT_NOT_FOUND"
-	// 		pcf_message.SendHttpResponseMessage(httpChannel, nil, 404, problem)
+	// 		message.SendHttpResponseMessage(httpChannel, nil, 404, problem)
 	// 	}
 	// 	_, resp, err := client.DefaultApi.PolicyDataUesUeIdSmDataGet(context.Background(), supi, nil)
 	// 	if err != nil {
 	// 		problem.Status = 404
 	// 		problem.Cause = "CONTEXT_NOT_FOUND"
-	// 		pcf_message.SendHttpResponseMessage(httpChannel, nil, 404, problem)
+	// 		message.SendHttpResponseMessage(httpChannel, nil, 404, problem)
 	// 	}
 	// 	if resp.StatusCode == 204 {
 	// 		UeContext[supi].SmPolicyControlStore = nil
 	// 		// pcf_producer_callback.CreateSmPolicyNotifyContext(fmt.Sprint(UeContext[supi].SmPolicyControlStore.Context.PduSessionId), "terminate", nil)
-	// 		pcf_message.SendHttpResponseMessage(httpChannel, nil, 204, nil)
+	// 		message.SendHttpResponseMessage(httpChannel, nil, 204, nil)
 	// 	}
 	// 	if resp.StatusCode == 200 {
 	// 		for key := range pcfUeContext {
@@ -61,10 +61,10 @@ func HandleSmPolicyNotify(httpChannel chan pcf_message.HttpResponseMessage, supi
 	// 					pcfUeContext[key].SmPolicyControlStore.Policy.Offline = smPolicyDecision.Offline
 	// 					counter = true
 	// 				}
-	// 				pcf_message.SendHttpResponseMessage(httpChannel, nil, 204, gin.H{})
+	// 				message.SendHttpResponseMessage(httpChannel, nil, 204, gin.H{})
 	// 				if counter {
 	// 					// pcf_producer_callback.CreateSmPolicyNotifyContext(fmt.Sprint(UeContext[supi].SmPolicyControlStore.Context.PduSessionId), "update", &smPolicyDecision)
-	// 					pcf_message.SendHttpResponseMessage(httpChannel, nil, 204, nil)
+	// 					message.SendHttpResponseMessage(httpChannel, nil, 204, nil)
 	// 				}
 
 	// 			}

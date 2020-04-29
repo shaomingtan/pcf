@@ -4,7 +4,7 @@ import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -27,8 +27,8 @@ func AmfStatusChangeNotify(c *gin.Context) {
 
 	req := http_wrapper.NewRequest(c.Request, request)
 
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventAMFStatusChangeNotify, req)
-	pcf_message.SendMessage(channelMsg)
+	channelMsg := message.NewHttpChannelMessage(message.EventAMFStatusChangeNotify, req)
+	message.SendMessage(channelMsg)
 
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse

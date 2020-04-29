@@ -1,4 +1,4 @@
-package pcf_message
+package message
 
 import (
 	"free5gc/lib/http_wrapper"

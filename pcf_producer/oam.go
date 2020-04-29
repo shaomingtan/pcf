@@ -4,7 +4,7 @@ import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/context"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"net/http"
 	"strconv"
 )
@@ -22,7 +22,7 @@ type UEAmPolicy struct {
 
 type UEAmPolicys []UEAmPolicy
 
-func HandleOAMGetAmPolicy(httpChannel chan pcf_message.HttpResponseMessage, supi string) {
+func HandleOAMGetAmPolicy(httpChannel chan message.HttpResponseMessage, supi string) {
 	logger.OamLog.Infof("Handle OAM Get Am Policy")
 
 	var response UEAmPolicys
@@ -44,12 +44,12 @@ func HandleOAMGetAmPolicy(httpChannel chan pcf_message.HttpResponseMessage, supi
 			}
 			response = append(response, ueAmPolicy)
 		}
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, response)
+		message.SendHttpResponseMessage(httpChannel, nil, http.StatusOK, response)
 	} else {
 		problem := models.ProblemDetails{
 			Status: http.StatusNotFound,
 			Cause:  "CONTEXT_NOT_FOUND",
 		}
-		pcf_message.SendHttpResponseMessage(httpChannel, nil, http.StatusNotFound, problem)
+		message.SendHttpResponseMessage(httpChannel, nil, http.StatusNotFound, problem)
 	}
 }

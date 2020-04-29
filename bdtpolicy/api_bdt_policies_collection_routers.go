@@ -12,7 +12,7 @@ package bdtpolicy
 import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,9 +23,9 @@ func CreateBDTPolicy(c *gin.Context) {
 	c.ShouldBindJSON(&bdtReqData)
 
 	req := http_wrapper.NewRequest(c.Request, bdtReqData)
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventBDTPolicyCreate, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventBDTPolicyCreate, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 	HTTPResponse := recvMsg.HTTPResponse
 

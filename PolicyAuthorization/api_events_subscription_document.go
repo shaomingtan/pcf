@@ -13,7 +13,7 @@ import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/pcf_util"
 
 	"github.com/gin-gonic/gin"
@@ -24,9 +24,9 @@ func DeleteEventsSubsc(c *gin.Context) {
 
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["appSessionId"], _ = c.Params.Get("appSessionId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventDeleteEventsSubsc, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventDeleteEventsSubsc, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 
 	HTTPResponse := recvMsg.HTTPResponse
@@ -52,9 +52,9 @@ func UpdateEventsSubsc(c *gin.Context) {
 
 	req := http_wrapper.NewRequest(c.Request, eventsSubscReqData)
 	req.Params["appSessionId"], _ = c.Params.Get("appSessionId")
-	channelMsg := pcf_message.NewHttpChannelMessage(pcf_message.EventUpdateEventsSubsc, req)
+	channelMsg := message.NewHttpChannelMessage(message.EventUpdateEventsSubsc, req)
 
-	pcf_message.SendMessage(channelMsg)
+	message.SendMessage(channelMsg)
 	recvMsg := <-channelMsg.HttpChannel
 
 	HTTPResponse := recvMsg.HTTPResponse

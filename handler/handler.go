@@ -3,7 +3,7 @@ package handler
 import (
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/handler/pcf_message"
+	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/pcf_producer"
 	"time"
 
@@ -20,63 +20,63 @@ func init() {
 func Handle() {
 	for {
 		select {
-		case msg, ok := <-pcf_message.PCFChannel:
+		case msg, ok := <-message.PCFChannel:
 			if ok {
 				switch msg.Event {
-				case pcf_message.EventBDTPolicyCreate:
+				case message.EventBDTPolicyCreate:
 					pcf_producer.CreateBDTPolicyContext(msg.HttpChannel, msg.HTTPRequest.Body.(models.BdtReqData))
-				case pcf_message.EventBDTPolicyGet:
+				case message.EventBDTPolicyGet:
 					bdtPolicyId := msg.HTTPRequest.Params["bdtPolicyId"]
 					pcf_producer.GetBDTPolicyContext(msg.HttpChannel, bdtPolicyId)
-				case pcf_message.EventBDTPolicyUpdate:
+				case message.EventBDTPolicyUpdate:
 					bdtPolicyId := msg.HTTPRequest.Params["bdtPolicyId"]
 					pcf_producer.UpdateBDTPolicyContext(msg.HttpChannel, bdtPolicyId, msg.HTTPRequest.Body.(models.BdtPolicyDataPatch))
-				case pcf_message.EventPostAppSessions:
+				case message.EventPostAppSessions:
 					pcf_producer.PostAppSessionsContext(msg.HttpChannel, msg.HTTPRequest.Body.(models.AppSessionContext))
-				case pcf_message.EventGetAppSession:
+				case message.EventGetAppSession:
 					appSessionId := msg.HTTPRequest.Params["appSessionId"]
 					pcf_producer.GetAppSessionContext(msg.HttpChannel, appSessionId)
-				case pcf_message.EventDeleteAppSession:
+				case message.EventDeleteAppSession:
 					appSessionId := msg.HTTPRequest.Params["appSessionId"]
 					pcf_producer.DeleteAppSessionContext(msg.HttpChannel, appSessionId, msg.HTTPRequest.Body.(*models.EventsSubscReqData))
-				case pcf_message.EventModAppSession:
+				case message.EventModAppSession:
 					appSessionId := msg.HTTPRequest.Params["appSessionId"]
 					pcf_producer.ModAppSessionContext(msg.HttpChannel, appSessionId, msg.HTTPRequest.Body.(models.AppSessionContextUpdateData))
-				case pcf_message.EventDeleteEventsSubsc:
+				case message.EventDeleteEventsSubsc:
 					appSessionId := msg.HTTPRequest.Params["appSessionId"]
 					pcf_producer.DeleteEventsSubscContext(msg.HttpChannel, appSessionId)
-				case pcf_message.EventUpdateEventsSubsc:
+				case message.EventUpdateEventsSubsc:
 					appSessionId := msg.HTTPRequest.Params["appSessionId"]
 					pcf_producer.UpdateEventsSubscContext(msg.HttpChannel, appSessionId, msg.HTTPRequest.Body.(models.EventsSubscReqData))
-				case pcf_message.EventAMPolicyGet:
+				case message.EventAMPolicyGet:
 					PolAssoId := msg.HTTPRequest.Params["polAssoId"]
 					pcf_producer.GetPoliciesPolAssoId(msg.HttpChannel, PolAssoId)
-				case pcf_message.EventAMPolicyDelete:
+				case message.EventAMPolicyDelete:
 					PolAssoId := msg.HTTPRequest.Params["polAssoId"]
 					pcf_producer.DeletePoliciesPolAssoId(msg.HttpChannel, PolAssoId)
-				case pcf_message.EventAMPolicyCreate:
+				case message.EventAMPolicyCreate:
 					pcf_producer.PostPolicies(msg.HttpChannel, msg.HTTPRequest.Body.(models.PolicyAssociationRequest))
-				case pcf_message.EventAMPolicyUpdate:
+				case message.EventAMPolicyUpdate:
 					PolAssoId := msg.HTTPRequest.Params["polAssoId"]
 					pcf_producer.UpdatePostPoliciesPolAssoId(msg.HttpChannel, PolAssoId, msg.HTTPRequest.Body.(models.PolicyAssociationUpdateRequest))
-				case pcf_message.EventSMPolicyCreate:
+				case message.EventSMPolicyCreate:
 					pcf_producer.CreateSmPolicy(msg.HttpChannel, msg.HTTPRequest.Body.(models.SmPolicyContextData))
-				case pcf_message.EventSMPolicyGet:
+				case message.EventSMPolicyGet:
 					smPolicyId := msg.HTTPRequest.Params["smPolicyId"]
 					pcf_producer.GetSmPolicyContext(msg.HttpChannel, smPolicyId)
-				case pcf_message.EventSMPolicyUpdate:
+				case message.EventSMPolicyUpdate:
 					smPolicyId := msg.HTTPRequest.Params["smPolicyId"]
 					pcf_producer.UpdateSmPolicyContext(msg.HttpChannel, smPolicyId, msg.HTTPRequest.Body.(models.SmPolicyUpdateContextData))
-				case pcf_message.EventSMPolicyDelete:
+				case message.EventSMPolicyDelete:
 					smPolicyId := msg.HTTPRequest.Params["smPolicyId"]
 					pcf_producer.DeleteSmPolicyContext(msg.HttpChannel, smPolicyId)
-				case pcf_message.EventSMPolicyNotify:
+				case message.EventSMPolicyNotify:
 					ReqURI := msg.HTTPRequest.Params["ReqURI"]
 					pcf_producer.HandleSmPolicyNotify(msg.HttpChannel, ReqURI, msg.HTTPRequest.Body.(models.PolicyDataChangeNotification))
-				case pcf_message.EventAMFStatusChangeNotify:
+				case message.EventAMFStatusChangeNotify:
 					pcf_producer.HandleAmfStatusChangeNotify(msg.HttpChannel, msg.HTTPRequest.Body.(models.AmfStatusChangeNotification))
 					// TODO: http event dispatcher
-				case pcf_message.EventOAMGetAmPolicy:
+				case message.EventOAMGetAmPolicy:
 					supi := msg.HTTPRequest.Params["supi"]
 					pcf_producer.HandleOAMGetAmPolicy(msg.HttpChannel, supi)
 				default:
