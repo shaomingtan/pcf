@@ -1,4 +1,4 @@
-package Npcf_OAM
+package oam
 
 import (
 	"net/http"

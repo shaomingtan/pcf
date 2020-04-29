@@ -3,24 +3,24 @@ package pcf_service
 import (
 	"bufio"
 	"fmt"
-	"github.com/gin-contrib/cors"
 	"free5gc/lib/Nnrf_NFDiscovery"
 	"free5gc/lib/http2_util"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
 	"free5gc/src/app"
-	"free5gc/src/pcf/ampolicy"
-	"free5gc/src/pcf/bdtpolicy"
-	"free5gc/src/pcf/httpcallback"
-	"free5gc/src/pcf/OAM"
 	"free5gc/src/pcf/PolicyAuthorization"
 	"free5gc/src/pcf/SMPolicy"
 	"free5gc/src/pcf/UEPolicy"
+	"free5gc/src/pcf/ampolicy"
+	"free5gc/src/pcf/bdtpolicy"
+	"free5gc/src/pcf/httpcallback"
 	"free5gc/src/pcf/logger"
+	"free5gc/src/pcf/oam"
 	"free5gc/src/pcf/pcf_consumer"
 	"free5gc/src/pcf/pcf_context"
 	"free5gc/src/pcf/pcf_handler"
 	"free5gc/src/pcf/pcf_util"
+	"github.com/gin-contrib/cors"
 	"os/exec"
 	"sync"
 
@@ -111,7 +111,7 @@ func (pcf *PCF) Start() {
 	UEPolicy.AddService(router)
 	PolicyAuthorization.AddService(router)
 	httpcallback.AddService(router)
-	Npcf_OAM.AddService(router)
+	oam.AddService(router)
 
 	router.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"},
