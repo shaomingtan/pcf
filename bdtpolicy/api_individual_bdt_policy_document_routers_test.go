@@ -1,4 +1,4 @@
-package BDTPolicy_test
+package bdtpolicy_test
 
 import (
 	"context"

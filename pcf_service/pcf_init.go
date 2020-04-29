@@ -10,7 +10,7 @@ import (
 	"free5gc/lib/path_util"
 	"free5gc/src/app"
 	"free5gc/src/pcf/ampolicy"
-	"free5gc/src/pcf/BDTPolicy"
+	"free5gc/src/pcf/bdtpolicy"
 	"free5gc/src/pcf/HttpCallback"
 	"free5gc/src/pcf/OAM"
 	"free5gc/src/pcf/PolicyAuthorization"
@@ -105,7 +105,7 @@ func (pcf *PCF) Start() {
 	initLog.Infoln("Server started")
 	router := gin.Default()
 
-	BDTPolicy.AddService(router)
+	bdtpolicy.AddService(router)
 	SMPolicy.AddService(router)
 	ampolicy.AddService(router)
 	UEPolicy.AddService(router)
