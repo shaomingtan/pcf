@@ -18,7 +18,7 @@ import (
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/producer"
-	"free5gc/src/pcf/pcf_service"
+	pcf_service "free5gc/src/pcf/service"
 	"free5gc/src/udr/udr_service"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"

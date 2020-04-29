@@ -1,4 +1,4 @@
-package pcf_service
+package service
 
 import (
 	"bufio"

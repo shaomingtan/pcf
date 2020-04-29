@@ -6,9 +6,9 @@ import (
 	"free5gc/lib/Nnrf_NFDiscovery"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/nrf/nrf_service"
-	"free5gc/src/pcf/factory"
 	"free5gc/src/pcf/consumer"
-	"free5gc/src/pcf/pcf_service"
+	"free5gc/src/pcf/factory"
+	pcf_service "free5gc/src/pcf/service"
 	"testing"
 	"time"
 

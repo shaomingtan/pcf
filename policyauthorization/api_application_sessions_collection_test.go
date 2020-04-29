@@ -20,7 +20,7 @@ import (
 	"free5gc/src/app"
 	"free5gc/src/nrf/nrf_service"
 	pcf_context "free5gc/src/pcf/context"
-	"free5gc/src/pcf/pcf_service"
+	pcf_service "free5gc/src/pcf/service"
 	"free5gc/src/udr/udr_service"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
