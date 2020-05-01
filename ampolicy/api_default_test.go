@@ -12,7 +12,7 @@ import (
 	"free5gc/lib/openapi/common"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
-	"free5gc/src/amf/amf_service"
+	amf_service "free5gc/src/amf/service"
 	"free5gc/src/app"
 	"free5gc/src/nrf/nrf_service"
 	pcf_context "free5gc/src/pcf/context"
