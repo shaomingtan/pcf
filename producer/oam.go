@@ -2,9 +2,9 @@ package pcf_producer
 
 import (
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/context"
 	"free5gc/src/pcf/handler/message"
+	"free5gc/src/pcf/logger"
 	"net/http"
 	"strconv"
 )
