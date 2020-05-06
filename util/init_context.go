@@ -3,9 +3,9 @@ package util
 import (
 	"encoding/hex"
 	"free5gc/lib/openapi/models"
+	"free5gc/src/pcf/context"
 	"free5gc/src/pcf/factory"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/context"
 
 	"github.com/google/uuid"
 )

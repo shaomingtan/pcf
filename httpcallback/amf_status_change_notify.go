@@ -3,8 +3,8 @@ package httpcallback
 import (
 	"free5gc/lib/http_wrapper"
 	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/handler/message"
+	"free5gc/src/pcf/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
