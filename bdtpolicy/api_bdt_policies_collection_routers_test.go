@@ -13,12 +13,12 @@ import (
 	"free5gc/src/app"
 	nrf_service "free5gc/src/nrf/service"
 	pcf_service "free5gc/src/pcf/service"
-	"free5gc/src/udr/DataRepository"
+	"free5gc/src/udr/consumer"
+	"free5gc/src/udr/datarepository"
 	"free5gc/src/udr/factory"
 	"free5gc/src/udr/logger"
-	"free5gc/src/udr/udr_consumer"
-	"free5gc/src/udr/udr_service"
-	"free5gc/src/udr/udr_util"
+	udr_service "free5gc/src/udr/service"
+	"free5gc/src/udr/util"
 	"log"
 	"net/http"
 	"testing"
@@ -45,19 +45,19 @@ func fakeudrInit() {
 	nrfUri := config.Configuration.NrfUri
 
 	// Connect to MongoDB
-	DataRepository.SetMongoDB(mongodb.Name, mongodb.Url)
+	datarepository.SetMongoDB(mongodb.Name, mongodb.Url)
 
-	udrLogPath := udr_util.UdrLogPath
-	udrPemPath := udr_util.UdrPemPath
-	udrKeyPath := udr_util.UdrKeyPath
+	udrLogPath := util.UdrLogPath
+	udrPemPath := util.UdrPemPath
+	udrKeyPath := util.UdrKeyPath
 	if sbi.Tls != nil {
 		udrLogPath = path_util.Gofree5gcPath(sbi.Tls.Log)
 		udrPemPath = path_util.Gofree5gcPath(sbi.Tls.Pem)
 		udrKeyPath = path_util.Gofree5gcPath(sbi.Tls.Key)
 	}
 
-	profile := udr_consumer.BuildNFInstance()
-	newNrfUri, _, err := udr_consumer.SendRegisterNFInstance(nrfUri, profile.NfInstanceId, profile)
+	profile := consumer.BuildNFInstance()
+	newNrfUri, _, err := consumer.SendRegisterNFInstance(nrfUri, profile.NfInstanceId, profile)
 	if err == nil {
 		config.Configuration.NrfUri = newNrfUri
 	} else {
