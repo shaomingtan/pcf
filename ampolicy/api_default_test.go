@@ -19,7 +19,7 @@ import (
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/producer"
 	pcf_service "free5gc/src/pcf/service"
-	"free5gc/src/udr/udr_service"
+	udr_service "free5gc/src/udr/service"
 	"net/http"
 	"strings"
 	"testing"

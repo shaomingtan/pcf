@@ -21,7 +21,7 @@ import (
 	nrf_service "free5gc/src/nrf/service"
 	pcf_context "free5gc/src/pcf/context"
 	pcf_service "free5gc/src/pcf/service"
-	"free5gc/src/udr/udr_service"
+	udr_service "free5gc/src/udr/service"
 	"net/http"
 	"strings"
 	"testing"
