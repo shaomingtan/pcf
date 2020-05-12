@@ -4,6 +4,18 @@
 
 package factory
 
+type Config struct {
+	Info *Info `yaml:"info"`
+
+	Configuration *Configuration `yaml:"configuration"`
+}
+
+type Info struct {
+	Version string `yaml:"version,omitempty"`
+
+	Description string `yaml:"description,omitempty"`
+}
+
 type Configuration struct {
 	PcfName string `yaml:"pcfName,omitempty"`
 
@@ -21,4 +33,11 @@ type Configuration struct {
 type Service struct {
 	ServiceName string `yaml:"serviceName"`
 	SuppFeat    string `yaml:"suppFeat,omitempty"`
+}
+
+type Sbi struct {
+	Scheme   string `yaml:"scheme"`
+	IPv4Addr string `yaml:"ipv4Addr,omitempty"`
+	// IPv6Addr string `yaml:"ipv6Addr,omitempty"`
+	Port int `yaml:"port,omitempty"`
 }
