@@ -20,9 +20,10 @@ import (
 	"free5gc/src/pcf/smpolicy"
 	"free5gc/src/pcf/uepolicy"
 	"free5gc/src/pcf/util"
-	"github.com/gin-contrib/cors"
 	"os/exec"
 	"sync"
+
+	"github.com/gin-contrib/cors"
 
 	"free5gc/src/pcf/factory"
 
@@ -169,10 +170,24 @@ func (pcf *PCF) Start() {
 		initLog.Errorln(err)
 	}
 	server, err := http2_util.NewServer(addr, util.PCF_LOG_PATH, router)
-	if err == nil && server != nil {
-		initLog.Infoln(server.ListenAndServeTLS(util.PCF_PEM_PATH, util.PCF_KEY_PATH))
-	} else {
-		initLog.Fatalf("Initialize http2 server failed: %+v", err)
+	if server == nil {
+		initLog.Errorln("Initialize HTTP server failed: %+v", err)
+		return
+	}
+
+	if err != nil {
+		initLog.Warnln("Initialize HTTP server: +%v", err)
+	}
+
+	serverScheme := factory.PcfConfig.Configuration.Sbi.Scheme
+	if serverScheme == "http" {
+		err = server.ListenAndServe()
+	} else if serverScheme == "https" {
+		err = server.ListenAndServeTLS(util.PCF_PEM_PATH, util.PCF_KEY_PATH)
+	}
+
+	if err != nil {
+		initLog.Fatalln("HTTP server setup failed: %+v", err)
 	}
 }
 
