@@ -7,19 +7,20 @@ import (
 	"free5gc/lib/CommonConsumerTestData/PCF/TestPolicyAuthorization"
 	"free5gc/lib/CommonConsumerTestData/PCF/TestSMPolicy"
 	"free5gc/lib/MongoDBLibrary"
-	"free5gc/lib/Npcf_AMPolicy"
-	"free5gc/lib/Npcf_PolicyAuthorization"
-	"free5gc/lib/Npcf_SMPolicyControl"
-	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi"
+	"free5gc/lib/openapi/Npcf_AMPolicy"
+	"free5gc/lib/openapi/Npcf_PolicyAuthorization"
+	"free5gc/lib/openapi/Npcf_SMPolicyControl"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
 	pcf_context "free5gc/src/pcf/context"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/gin-gonic/gin"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -307,7 +308,7 @@ func TestAppSessionNotification(t *testing.T) {
 		assert.True(t, httpRsp != nil)
 		if httpRsp != nil {
 			assert.Equal(t, http.StatusNotFound, httpRsp.StatusCode)
-			problem := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			problem := err.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 			assert.Equal(t, "APPLICATION_SESSION_CONTEXT_NOT_FOUND", problem.Cause)
 		}
 	}

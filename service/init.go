@@ -3,8 +3,8 @@ package service
 import (
 	"bufio"
 	"fmt"
-	"free5gc/lib/Nnrf_NFDiscovery"
 	"free5gc/lib/http2_util"
+	"free5gc/lib/openapi/Nnrf_NFDiscovery"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
 	"free5gc/src/app"

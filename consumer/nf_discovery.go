@@ -3,13 +3,14 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/Nnrf_NFDiscovery"
+	"free5gc/lib/openapi/Nnrf_NFDiscovery"
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/util"
-	"github.com/antihax/optional"
 	"net/http"
+
+	"github.com/antihax/optional"
 )
 
 func SendSearchNFInstances(nrfUri string, targetNfType, requestNfType models.NfType, param Nnrf_NFDiscovery.SearchNFInstancesParamOpts) (result models.SearchResult, err error) {

@@ -9,11 +9,11 @@ import (
 	"free5gc/lib/CommonConsumerTestData/PCF/TestPolicyAuthorization"
 	"free5gc/lib/CommonConsumerTestData/PCF/TestSMPolicy"
 	"free5gc/lib/MongoDBLibrary"
-	"free5gc/lib/Npcf_AMPolicy"
-	"free5gc/lib/Npcf_PolicyAuthorization"
-	"free5gc/lib/Npcf_SMPolicyControl"
 	"free5gc/lib/http2_util"
-	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi"
+	"free5gc/lib/openapi/Npcf_AMPolicy"
+	"free5gc/lib/openapi/Npcf_PolicyAuthorization"
+	"free5gc/lib/openapi/Npcf_SMPolicyControl"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
 	amf_service "free5gc/src/amf/service"
@@ -285,7 +285,7 @@ func TestApplicationSessionsCollection(t *testing.T) {
 		assert.True(t, httpRsp != nil)
 		if httpRsp != nil {
 			assert.Equal(t, http.StatusForbidden, httpRsp.StatusCode)
-			problem := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			problem := err.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 			assert.Equal(t, "REQUESTED_SERVICE_NOT_AUTHORIZED", problem.Cause)
 		}
 	}
@@ -296,7 +296,7 @@ func TestApplicationSessionsCollection(t *testing.T) {
 		assert.True(t, httpRsp != nil)
 		if httpRsp != nil {
 			assert.Equal(t, http.StatusBadRequest, httpRsp.StatusCode)
-			problem := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			problem := err.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 			assert.Equal(t, "ERROR_REQUEST_PARAMETERS", problem.Cause)
 		}
 	}

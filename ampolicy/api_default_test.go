@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"free5gc/lib/CommonConsumerTestData/PCF/TestAMPolicy"
 	"free5gc/lib/MongoDBLibrary"
-	"free5gc/lib/Npcf_AMPolicy"
 	"free5gc/lib/http2_util"
-	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi"
+	"free5gc/lib/openapi/Npcf_AMPolicy"
 	"free5gc/lib/openapi/models"
 	"free5gc/lib/path_util"
 	amf_service "free5gc/src/amf/service"
@@ -17,7 +17,6 @@ import (
 	nrf_service "free5gc/src/nrf/service"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/producer"
 	pcf_service "free5gc/src/pcf/service"
 	udr_service "free5gc/src/udr/service"
 	"net/http"
@@ -102,7 +101,7 @@ func TestCreateAMPolicy(t *testing.T) {
 		assert.True(t, httpRsp != nil)
 		if httpRsp != nil {
 			assert.Equal(t, http.StatusBadRequest, httpRsp.StatusCode)
-			problem := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			problem := err.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 			assert.Equal(t, "ERROR_REQUEST_PARAMETERS", problem.Cause)
 			assert.Equal(t, "Miss Mandotory IE", problem.Detail)
 		}
@@ -114,7 +113,7 @@ func TestCreateAMPolicy(t *testing.T) {
 		assert.True(t, httpRsp != nil)
 		if httpRsp != nil {
 			assert.Equal(t, http.StatusBadRequest, httpRsp.StatusCode)
-			problem := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			problem := err.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 			assert.Equal(t, "ERROR_REQUEST_PARAMETERS", problem.Cause)
 			assert.Equal(t, "Supi Format Error", problem.Detail)
 		}
@@ -203,7 +202,7 @@ func TestDelAMPolicy(t *testing.T) {
 		assert.True(t, httpRsp != nil)
 		if httpRsp != nil {
 			assert.Equal(t, http.StatusNotFound, httpRsp.StatusCode)
-			problem := err.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+			problem := err.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 			assert.Equal(t, "CONTEXT_NOT_FOUND", problem.Cause)
 		}
 	}

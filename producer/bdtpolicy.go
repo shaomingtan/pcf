@@ -3,17 +3,18 @@ package pcf_producer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/Nnrf_NFDiscovery"
-	"free5gc/lib/Nudr_DataRepository"
+	"free5gc/lib/openapi/Nnrf_NFDiscovery"
+	"free5gc/lib/openapi/Nudr_DataRepository"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/consumer"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/handler/message"
 	"free5gc/src/pcf/logger"
 	"free5gc/src/pcf/util"
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/mohae/deepcopy"
-	"net/http"
 
 	"github.com/antihax/optional"
 )
