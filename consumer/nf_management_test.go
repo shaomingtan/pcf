@@ -3,7 +3,7 @@ package consumer_test
 import (
 	"flag"
 	"free5gc/lib/MongoDBLibrary"
-	"free5gc/lib/Nnrf_NFDiscovery"
+	"free5gc/lib/openapi/Nnrf_NFDiscovery"
 	"free5gc/lib/openapi/models"
 	nrf_service "free5gc/src/nrf/service"
 	"free5gc/src/pcf/consumer"

@@ -3,7 +3,7 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/openapi/common"
+	"free5gc/lib/openapi"
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/logger"
@@ -38,10 +38,10 @@ func AmfStatusChangeSubscribe(amfInfo pcf_context.AMFStatusSubscriptionData) (pr
 			err = localErr
 			return
 		}
-		problem := localErr.(common.GenericOpenAPIError).Model().(models.ProblemDetails)
+		problem := localErr.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 		problemDetails = &problem
 	} else {
-		err = common.ReportError("%s: server no response", amfInfo.AmfUri)
+		err = openapi.ReportError("%s: server no response", amfInfo.AmfUri)
 	}
 	return
 }

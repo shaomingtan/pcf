@@ -3,7 +3,7 @@ package pcf_producer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/Nudr_DataRepository"
+	"free5gc/lib/openapi/Nudr_DataRepository"
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/handler/message"

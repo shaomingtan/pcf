@@ -2,14 +2,15 @@ package bdtpolicy_test
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	TestBDTPolicy "free5gc/lib/CommonConsumerTestData/PCF/TestBDTPolicy"
-	"free5gc/lib/Npcf_BDTPolicyControl"
+	"free5gc/lib/openapi/Npcf_BDTPolicyControl"
 	"free5gc/lib/openapi/models"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetUpdateBDTPolicy(t *testing.T) {
