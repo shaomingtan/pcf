@@ -200,24 +200,33 @@ func (context *PCFContext) PcfUeFindByIPv6(v6 string) *UeContext {
 	return nil
 }
 
-// Session Binding from application request to get corresponding Sm policy
+// SessionBinding from application request to get corresponding Sm policy
 func (context *PCFContext) SessionBinding(req *models.AppSessionContextReqData) (policy *UeSmPolicyData, err error) {
 	// TODO: support dnn, snssai, ... because Ip Address is not enough with same ip address in different ip domains, details in subclause 4.2.2.2 of TS 29514
+	var selectedUE *UeContext
+
 	if ue, exist := context.UePool[req.Supi]; exist {
+		selectedUE = ue
+	}
+
+	if req.Gpsi != "" && selectedUE == nil {
+		for _, ue := range context.UePool {
+			if ue.Gpsi == req.Gpsi {
+				selectedUE = ue
+			}
+		}
+	}
+
+	if selectedUE != nil {
 		if req.UeIpv4 != "" {
-			policy = ue.SMPolicyFindByIpv4(req.UeIpv4)
+			policy = selectedUE.SMPolicyFindByIdentifiersIpv4(req.UeIpv4, req.SliceInfo, req.Dnn)
 		} else if req.UeIpv6 != "" {
-			policy = ue.SMPolicyFindByIpv6(req.UeIpv6)
+			policy = selectedUE.SMPolicyFindByIdentifiersIpv6(req.UeIpv6, req.SliceInfo, req.Dnn)
 		} else {
 			err = fmt.Errorf("Ue finding by MAC address does not support")
 		}
-	} else if req.UeIpv4 != "" {
-		policy = ue.SMPolicyFindByIpv4(req.UeIpv4)
-	} else if req.UeIpv6 != "" {
-		policy = ue.SMPolicyFindByIpv6(req.UeIpv6)
-	} else {
-		err = fmt.Errorf("Ue finding by MAC address does not support")
 	}
+
 	if err == nil && policy == nil {
 		if req.UeIpv4 != "" {
 			err = fmt.Errorf("Can't find Ue with Ipv4[%s]", req.UeIpv4)
