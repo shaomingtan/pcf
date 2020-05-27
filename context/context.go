@@ -219,9 +219,9 @@ func (context *PCFContext) SessionBinding(req *models.AppSessionContextReqData) 
 
 	if selectedUE != nil {
 		if req.UeIpv4 != "" {
-			policy = selectedUE.SMPolicyFindByIpv4(req.UeIpv4)
+			policy = selectedUE.SMPolicyFindByIdentifiersIpv4(req.UeIpv4, req.SliceInfo, req.Dnn)
 		} else if req.UeIpv6 != "" {
-			policy = selectedUE.SMPolicyFindByIpv6(req.UeIpv6)
+			policy = selectedUE.SMPolicyFindByIdentifiersIpv6(req.UeIpv6, req.SliceInfo, req.Dnn)
 		} else {
 			err = fmt.Errorf("Ue finding by MAC address does not support")
 		}
