@@ -2,6 +2,7 @@ package context
 
 import (
 	"fmt"
+	"free5gc/lib/openapi"
 	"free5gc/lib/openapi/models"
 	"free5gc/src/pcf/factory"
 	"strconv"
@@ -17,7 +18,7 @@ func init() {
 	PCF_Self().DefaultBdtRefId = "BdtPolicyId-"
 	PCF_Self().NfService = make(map[models.ServiceName]models.NfService)
 	PCF_Self().PcfServiceUris = make(map[models.ServiceName]string)
-	PCF_Self().PcfSuppFeats = make(map[models.ServiceName][]byte)
+	PCF_Self().PcfSuppFeats = make(map[models.ServiceName]openapi.SupportedFeature)
 	PCF_Self().UePool = make(map[string]*UeContext)
 	PCF_Self().BdtPolicyPool = make(map[string]models.BdtPolicy)
 	PCF_Self().BdtPolicyIdGenerator = 1
@@ -35,7 +36,7 @@ type PCFContext struct {
 	DefaultBdtRefId string
 	NfService       map[models.ServiceName]models.NfService
 	PcfServiceUris  map[models.ServiceName]string
-	PcfSuppFeats    map[models.ServiceName][]byte
+	PcfSuppFeats    map[models.ServiceName]openapi.SupportedFeature
 	NrfUri          string
 	DefaultUdrUri   string
 	UePool          map[string]*UeContext
