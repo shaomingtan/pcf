@@ -3,6 +3,7 @@ package pcf_producer
 import (
 	"context"
 	"fmt"
+	"free5gc/lib/openapi"
 	"free5gc/lib/openapi/models"
 	pcf_context "free5gc/src/pcf/context"
 	"free5gc/src/pcf/handler/message"
@@ -61,7 +62,9 @@ func PostAppSessionsContext(httpChannel chan message.HttpResponseMessage, reques
 	}
 	ue := smPolicy.PcfUe
 	updateSMpolicy := false
-	nSuppFeat := util.GetNegotiateSuppFeat(reqData.SuppFeat, pcfSelf.PcfSuppFeats[models.ServiceName_NPCF_POLICYAUTHORIZATION])
+
+	requestSuppFeat, _ := openapi.NewSupportedFeature(reqData.SuppFeat)
+	nSuppFeat := pcfSelf.PcfSuppFeats[models.ServiceName_NPCF_POLICYAUTHORIZATION].NegotiateWith(requestSuppFeat).String()
 	traffRoutSupp := util.CheckSuppFeat(nSuppFeat, 1) && util.CheckSuppFeat(smPolicy.PolicyDecision.SuppFeat, 1) // InfluenceOnTrafficRouting = 1 in 29514 &  Traffic Steering Control support = 1 in 29512
 	relatedPccRuleIds := make(map[string]string)
 
@@ -1011,9 +1014,11 @@ func SendAppSessionTermination(appSession *pcf_context.AppSessionData, request m
 // Handle Create/ Modify  Background Data Transfer Policy Indication
 func handleBackgroundDataTransferPolicyIndication(pcfSelf *pcf_context.PCFContext, appContext *models.AppSessionContext) (err error) {
 	req := appContext.AscReqData
+
+	requestSuppFeat, _ := openapi.NewSupportedFeature(req.SuppFeat)
 	respData := models.AppSessionContextRespData{
 		ServAuthInfo: models.ServAuthInfo_NOT_KNOWN,
-		SuppFeat:     util.GetNegotiateSuppFeat(req.SuppFeat, pcfSelf.PcfSuppFeats[models.ServiceName_NPCF_POLICYAUTHORIZATION]),
+		SuppFeat:     pcfSelf.PcfSuppFeats[models.ServiceName_NPCF_POLICYAUTHORIZATION].NegotiateWith(requestSuppFeat).String(),
 	}
 	client := util.GetNudrClient(getDefaultUdrUri(pcfSelf))
 	bdtData, resp, err1 := client.DefaultApi.PolicyDataBdtDataBdtReferenceIdGet(context.Background(), req.BdtRefId)
