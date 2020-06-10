@@ -212,17 +212,18 @@ func PostAppSessionsContext(httpChannel chan message.HttpResponseMessage, reques
 		if reqData.AfRoutReq != nil && traffRoutSupp {
 			decision := smPolicy.PolicyDecision
 			cnt := 0
+			createdTcData := models.TrafficControlData{
+				FlowStatus:     models.FlowStatus_ENABLED,
+				RouteToLocs:    reqData.AfRoutReq.RouteToLocs,
+				UpPathChgEvent: reqData.AfRoutReq.UpPathChgSub,
+			}
+
 			for _, rule := range smPolicy.PolicyDecision.PccRules {
 				if rule.AppId == reqData.AfAppId {
-					tcData := models.TrafficControlData{
-						TcId:       strings.ReplaceAll(rule.PccRuleId, "PccRule", "Tc"),
-						FlowStatus: models.FlowStatus_ENABLED,
-					}
-					tcData.RouteToLocs = append(tcData.RouteToLocs, reqData.AfRoutReq.RouteToLocs...)
-					tcData.UpPathChgEvent = reqData.AfRoutReq.UpPathChgSub
-					rule.RefTcData = []string{tcData.TcId}
+					createdTcData.TcId = strings.ReplaceAll(rule.PccRuleId, "PccRule", "Tc")
+					rule.RefTcData = []string{createdTcData.TcId}
 					rule.AppReloc = reqData.AfRoutReq.AppReloc
-					util.SetPccRuleRelatedData(decision, &rule, &tcData, nil, nil, nil)
+					util.SetPccRuleRelatedData(decision, &rule, &createdTcData, nil, nil, nil)
 					updateSMpolicy = true
 					key := fmt.Sprintf("appId-%s-%d", reqData.AfAppId, cnt)
 					relatedPccRuleIds[key] = rule.PccRuleId
@@ -238,10 +239,10 @@ func PostAppSessionsContext(httpChannel chan message.HttpResponseMessage, reques
 					QosId:                util.GetQosId(smPolicy.PccRuleIdGenarator),
 					DefQosFlowIndication: true,
 				}
-				tcData := util.CreateTcData(smPolicy.PccRuleIdGenarator, "")
-				pccRule.RefTcData = []string{tcData.TcId}
+				createdTcData.TcId = util.GetTcId(smPolicy.PccRuleIdGenarator)
+				pccRule.RefTcData = []string{createdTcData.TcId}
 				pccRule.RefQosData = []string{qosData.QosId}
-				util.SetPccRuleRelatedData(decision, pccRule, &tcData, &qosData, nil, nil)
+				util.SetPccRuleRelatedData(decision, pccRule, &createdTcData, &qosData, nil, nil)
 				smPolicy.PccRuleIdGenarator++
 				updateSMpolicy = true
 				key := fmt.Sprintf("appId-%s", reqData.AfAppId)
