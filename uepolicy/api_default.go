@@ -15,20 +15,16 @@ import (
 
 // PoliciesPolAssoIdDelete -
 func PoliciesPolAssoIdDelete(c *gin.Context) {
-
 }
 
 // PoliciesPolAssoIdGet -
 func PoliciesPolAssoIdGet(c *gin.Context) {
-
 }
 
 // PoliciesPolAssoIdUpdatePost -
 func PoliciesPolAssoIdUpdatePost(c *gin.Context) {
-
 }
 
 // PoliciesPost -
 func PoliciesPost(c *gin.Context) {
-
 }

@@ -2,13 +2,13 @@ package util
 
 import (
 	"fmt"
-	"free5gc/lib/openapi/models"
+
+	"github.com/free5gc/openapi/models"
 )
 
 // SearchNFServiceUri returns NF Uri derived from NfProfile with corresponding service
 func SearchNFServiceUri(nfProfile models.NfProfile, serviceName models.ServiceName,
 	nfServiceStatus models.NfServiceStatus) (nfUri string) {
-
 	if nfProfile.NfServices != nil {
 		for _, service := range *nfProfile.NfServices {
 			if service.ServiceName == serviceName && service.NfServiceStatus == nfServiceStatus {

@@ -10,15 +10,16 @@
 package policyauthorization
 
 import (
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/producer"
-	"free5gc/src/pcf/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/producer"
+	"github.com/free5gc/pcf/util"
 )
 
 // HTTPPostAppSessions - Creates a new Individual Application Session Context resource

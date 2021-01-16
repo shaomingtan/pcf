@@ -3,32 +3,37 @@ package service
 import (
 	"bufio"
 	"fmt"
+	"os"
 	"os/exec"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/antihax/optional"
 	"github.com/gin-contrib/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 
-	"free5gc/lib/http2_util"
-	"free5gc/lib/logger_util"
-	"free5gc/lib/openapi/Nnrf_NFDiscovery"
-	"free5gc/lib/openapi/models"
-	"free5gc/lib/path_util"
-	"free5gc/src/app"
-	"free5gc/src/pcf/ampolicy"
-	"free5gc/src/pcf/bdtpolicy"
-	"free5gc/src/pcf/consumer"
-	"free5gc/src/pcf/context"
-	"free5gc/src/pcf/factory"
-	"free5gc/src/pcf/httpcallback"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/oam"
-	"free5gc/src/pcf/policyauthorization"
-	"free5gc/src/pcf/smpolicy"
-	"free5gc/src/pcf/uepolicy"
-	"free5gc/src/pcf/util"
+	"github.com/free5gc/http2_util"
+	"github.com/free5gc/logger_util"
+	"github.com/free5gc/openapi/Nnrf_NFDiscovery"
+	openApiLogger "github.com/free5gc/openapi/logger"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/path_util"
+	pathUtilLogger "github.com/free5gc/path_util/logger"
+	"github.com/free5gc/pcf/ampolicy"
+	"github.com/free5gc/pcf/bdtpolicy"
+	"github.com/free5gc/pcf/consumer"
+	"github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/factory"
+	"github.com/free5gc/pcf/httpcallback"
+	"github.com/free5gc/pcf/internal/notifyevent"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/oam"
+	"github.com/free5gc/pcf/policyauthorization"
+	"github.com/free5gc/pcf/smpolicy"
+	"github.com/free5gc/pcf/uepolicy"
+	"github.com/free5gc/pcf/util"
 )
 
 type PCF struct{}
@@ -63,33 +68,84 @@ func (*PCF) GetCliCmd() (flags []cli.Flag) {
 	return pcfCLi
 }
 
-func (*PCF) Initialize(c *cli.Context) {
-
+func (pcf *PCF) Initialize(c *cli.Context) error {
 	config = Config{
 		pcfcfg: c.String("pcfcfg"),
 	}
 	if config.pcfcfg != "" {
-		factory.InitConfigFactory(config.pcfcfg)
-	} else {
-		DefaultPcfConfigPath := path_util.Gofree5gcPath("free5gc/config/pcfcfg.conf")
-		factory.InitConfigFactory(DefaultPcfConfigPath)
-	}
-
-	if app.ContextSelf().Logger.PCF.DebugLevel != "" {
-		level, err := logrus.ParseLevel(app.ContextSelf().Logger.PCF.DebugLevel)
-		if err != nil {
-			initLog.Warnf("Log level [%s] is not valid, set to [info] level", app.ContextSelf().Logger.PCF.DebugLevel)
-			logger.SetLogLevel(logrus.InfoLevel)
-		} else {
-			logger.SetLogLevel(level)
-			initLog.Infof("Log level is set to [%s] level", level)
+		if err := factory.InitConfigFactory(config.pcfcfg); err != nil {
+			return err
 		}
 	} else {
-		initLog.Infoln("Log level is default set to [info] level")
-		logger.SetLogLevel(logrus.InfoLevel)
+		DefaultPcfConfigPath := path_util.Free5gcPath("free5gc/config/pcfcfg.yaml")
+		if err := factory.InitConfigFactory(DefaultPcfConfigPath); err != nil {
+			return err
+		}
 	}
 
-	logger.SetReportCaller(app.ContextSelf().Logger.PCF.ReportCaller)
+	pcf.setLogLevel()
+
+	if err := factory.CheckConfigVersion(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pcf *PCF) setLogLevel() {
+	if factory.PcfConfig.Logger == nil {
+		initLog.Warnln("PCF config without log level setting!!!")
+		return
+	}
+
+	if factory.PcfConfig.Logger.PCF != nil {
+		if factory.PcfConfig.Logger.PCF.DebugLevel != "" {
+			if level, err := logrus.ParseLevel(factory.PcfConfig.Logger.PCF.DebugLevel); err != nil {
+				initLog.Warnf("PCF Log level [%s] is invalid, set to [info] level",
+					factory.PcfConfig.Logger.PCF.DebugLevel)
+				logger.SetLogLevel(logrus.InfoLevel)
+			} else {
+				initLog.Infof("PCF Log level is set to [%s] level", level)
+				logger.SetLogLevel(level)
+			}
+		} else {
+			initLog.Infoln("PCF Log level is default set to [info] level")
+			logger.SetLogLevel(logrus.InfoLevel)
+		}
+		logger.SetReportCaller(factory.PcfConfig.Logger.PCF.ReportCaller)
+	}
+
+	if factory.PcfConfig.Logger.PathUtil != nil {
+		if factory.PcfConfig.Logger.PathUtil.DebugLevel != "" {
+			if level, err := logrus.ParseLevel(factory.PcfConfig.Logger.PathUtil.DebugLevel); err != nil {
+				pathUtilLogger.PathLog.Warnf("PathUtil Log level [%s] is invalid, set to [info] level",
+					factory.PcfConfig.Logger.PathUtil.DebugLevel)
+				pathUtilLogger.SetLogLevel(logrus.InfoLevel)
+			} else {
+				pathUtilLogger.SetLogLevel(level)
+			}
+		} else {
+			pathUtilLogger.PathLog.Warnln("PathUtil Log level not set. Default set to [info] level")
+			pathUtilLogger.SetLogLevel(logrus.InfoLevel)
+		}
+		pathUtilLogger.SetReportCaller(factory.PcfConfig.Logger.PathUtil.ReportCaller)
+	}
+
+	if factory.PcfConfig.Logger.OpenApi != nil {
+		if factory.PcfConfig.Logger.OpenApi.DebugLevel != "" {
+			if level, err := logrus.ParseLevel(factory.PcfConfig.Logger.OpenApi.DebugLevel); err != nil {
+				openApiLogger.OpenApiLog.Warnf("OpenAPI Log level [%s] is invalid, set to [info] level",
+					factory.PcfConfig.Logger.OpenApi.DebugLevel)
+				openApiLogger.SetLogLevel(logrus.InfoLevel)
+			} else {
+				openApiLogger.SetLogLevel(level)
+			}
+		} else {
+			openApiLogger.OpenApiLog.Warnln("OpenAPI Log level not set. Default set to [info] level")
+			openApiLogger.SetLogLevel(logrus.InfoLevel)
+		}
+		openApiLogger.SetReportCaller(factory.PcfConfig.Logger.OpenApi.ReportCaller)
+	}
 }
 
 func (pcf *PCF) FilterCli(c *cli.Context) (args []string) {
@@ -119,13 +175,19 @@ func (pcf *PCF) Start() {
 
 	router.Use(cors.New(cors.Config{
 		AllowMethods: []string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"},
-		AllowHeaders: []string{"Origin", "Content-Length", "Content-Type", "User-Agent",
-			"Referrer", "Host", "Token", "X-Requested-With"},
+		AllowHeaders: []string{
+			"Origin", "Content-Length", "Content-Type", "User-Agent",
+			"Referrer", "Host", "Token", "X-Requested-With",
+		},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		AllowAllOrigins:  true,
 		MaxAge:           86400,
 	}))
+
+	if err := notifyevent.RegisterNotifyDispatcher(); err != nil {
+		initLog.Error("Register NotifyDispatcher Error")
+	}
 
 	self := context.PCF_Self()
 	util.InitpcfContext(self)
@@ -141,24 +203,6 @@ func (pcf *PCF) Start() {
 		initLog.Errorf("PCF register to NRF Error[%s]", err.Error())
 	}
 
-	// subscribe to all Amfs' status change
-	amfInfos := consumer.SearchAvailableAMFs(self.NrfUri, models.ServiceName_NAMF_COMM)
-	for _, amfInfo := range amfInfos {
-		guamiList := util.GetNotSubscribedGuamis(amfInfo.GuamiList)
-		if len(guamiList) == 0 {
-			continue
-		}
-		var problemDetails *models.ProblemDetails
-		problemDetails, err = consumer.AmfStatusChangeSubscribe(amfInfo)
-		if problemDetails != nil {
-			logger.InitLog.Warnf("AMF status subscribe Failed[%+v]", problemDetails)
-		} else if err != nil {
-			logger.InitLog.Warnf("AMF status subscribe Error[%+v]", err)
-		}
-	}
-
-	// TODO: subscribe NRF NFstatus
-
 	param := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
 		ServiceNames: optional.NewInterface([]models.ServiceName{models.ServiceName_NUDR_DR}),
 	}
@@ -173,6 +217,15 @@ func (pcf *PCF) Start() {
 	if err != nil {
 		initLog.Errorln(err)
 	}
+
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-signalChannel
+		pcf.Terminate()
+		os.Exit(0)
+	}()
+
 	server, err := http2_util.NewServer(addr, util.PCF_LOG_PATH, router)
 	if server == nil {
 		initLog.Errorf("Initialize HTTP server failed: %+v", err)
@@ -240,4 +293,18 @@ func (pcf *PCF) Exec(c *cli.Context) error {
 	wg.Wait()
 
 	return err
+}
+
+func (pcf *PCF) Terminate() {
+	logger.InitLog.Infof("Terminating PCF...")
+	// deregister with NRF
+	problemDetails, err := consumer.SendDeregisterNFInstance()
+	if problemDetails != nil {
+		logger.InitLog.Errorf("Deregister NF instance Failed Problem[%+v]", problemDetails)
+	} else if err != nil {
+		logger.InitLog.Errorf("Deregister NF instance Error[%+v]", err)
+	} else {
+		logger.InitLog.Infof("Deregister from NRF successfully")
+	}
+	logger.InitLog.Infof("PCF terminated")
 }

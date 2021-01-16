@@ -3,31 +3,38 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/openapi/Nnrf_NFDiscovery"
-	"free5gc/lib/openapi/models"
-	pcf_context "free5gc/src/pcf/context"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/util"
 	"net/http"
 
 	"github.com/antihax/optional"
+
+	"github.com/free5gc/openapi/Nnrf_NFDiscovery"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/util"
 )
 
 func SendSearchNFInstances(
 	nrfUri string, targetNfType, requestNfType models.NfType, param Nnrf_NFDiscovery.SearchNFInstancesParamOpts) (
-	result models.SearchResult, err error) {
-
+	*models.SearchResult, error) {
 	// Set client and set url
 	configuration := Nnrf_NFDiscovery.NewConfiguration()
 	configuration.SetBasePath(nrfUri)
 	client := Nnrf_NFDiscovery.NewAPIClient(configuration)
 
-	var res *http.Response
-	result, res, err = client.NFInstancesStoreApi.SearchNFInstances(context.TODO(), targetNfType, requestNfType, &param)
-	if res != nil && res.StatusCode == http.StatusTemporaryRedirect {
-		err = fmt.Errorf("Temporary Redirect For Non NRF Consumer")
+	result, res, err := client.NFInstancesStoreApi.SearchNFInstances(context.TODO(), targetNfType, requestNfType, &param)
+	if err != nil {
+		logger.ConsumerLog.Errorf("SearchNFInstances failed: %+v", err)
 	}
-	return
+	defer func() {
+		if resCloseErr := res.Body.Close(); resCloseErr != nil {
+			logger.ConsumerLog.Errorf("NFInstancesStoreApi response body cannot close: %+v", resCloseErr)
+		}
+	}()
+	if res != nil && res.StatusCode == http.StatusTemporaryRedirect {
+		return nil, fmt.Errorf("Temporary Redirect For Non NRF Consumer")
+	}
+
+	return &result, nil
 }
 
 func SendNFIntancesUDR(nrfUri, id string) string {
@@ -83,27 +90,4 @@ func SendNFIntancesAMF(nrfUri string, guami models.Guami, serviceName models.Ser
 		return util.SearchNFServiceUri(profile, serviceName, models.NfServiceStatus_REGISTERED)
 	}
 	return ""
-}
-
-func SearchAvailableAMFs(nrfUri string, serviceName models.ServiceName) (
-	amfInfos []pcf_context.AMFStatusSubscriptionData) {
-	localVarOptionals := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{}
-
-	result, err := SendSearchNFInstances(nrfUri, models.NfType_AMF, models.NfType_PCF, localVarOptionals)
-	if err != nil {
-		logger.Consumerlog.Error(err.Error())
-		return
-	}
-
-	for _, profile := range result.NfInstances {
-		uri := util.SearchNFServiceUri(profile, serviceName, models.NfServiceStatus_REGISTERED)
-		if uri != "" {
-			item := pcf_context.AMFStatusSubscriptionData{
-				AmfUri:    uri,
-				GuamiList: *profile.AmfInfo.GuamiList,
-			}
-			amfInfos = append(amfInfos, item)
-		}
-	}
-	return
 }

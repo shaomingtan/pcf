@@ -7,24 +7,29 @@ import (
 	formatter "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/sirupsen/logrus"
 
-	"free5gc/lib/logger_conf"
-	"free5gc/lib/logger_util"
+	"github.com/free5gc/logger_conf"
+	"github.com/free5gc/logger_util"
 )
 
-var log *logrus.Logger
-var AppLog *logrus.Entry
-var InitLog *logrus.Entry
-var HandlerLog *logrus.Entry
-var Bdtpolicylog *logrus.Entry
-var PolicyAuthorizationlog *logrus.Entry
-var AMpolicylog *logrus.Entry
-var SMpolicylog *logrus.Entry
-var Consumerlog *logrus.Entry
-var UtilLog *logrus.Entry
-var CallbackLog *logrus.Entry
-var OamLog *logrus.Entry
-var CtxLog *logrus.Entry
-var GinLog *logrus.Entry
+var (
+	log                    *logrus.Logger
+	AppLog                 *logrus.Entry
+	InitLog                *logrus.Entry
+	CfgLog                 *logrus.Entry
+	HandlerLog             *logrus.Entry
+	Bdtpolicylog           *logrus.Entry
+	PolicyAuthorizationlog *logrus.Entry
+	AMpolicylog            *logrus.Entry
+	SMpolicylog            *logrus.Entry
+	Consumerlog            *logrus.Entry
+	UtilLog                *logrus.Entry
+	CallbackLog            *logrus.Entry
+	OamLog                 *logrus.Entry
+	CtxLog                 *logrus.Entry
+	ConsumerLog            *logrus.Entry
+	GinLog                 *logrus.Entry
+	NotifyEventLog         *logrus.Entry
+)
 
 func init() {
 	log = logrus.New()
@@ -38,18 +43,19 @@ func init() {
 		FieldsOrder:     []string{"component", "category"},
 	}
 
-	free5gcLogHook, err := logger_util.NewFileHook(logger_conf.Free5gcLogFile, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	free5gcLogHook, err := logger_util.NewFileHook(logger_conf.Free5gcLogFile, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0o666)
 	if err == nil {
 		log.Hooks.Add(free5gcLogHook)
 	}
 
-	selfLogHook, err := logger_util.NewFileHook(logger_conf.NfLogDir+"pcf.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	selfLogHook, err := logger_util.NewFileHook(logger_conf.NfLogDir+"pcf.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0o666)
 	if err == nil {
 		log.Hooks.Add(selfLogHook)
 	}
 
 	AppLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "App"})
 	InitLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Init"})
+	CfgLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "CFG"})
 	HandlerLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Handler"})
 	Bdtpolicylog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Bdtpolicy"})
 	AMpolicylog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Ampolicy"})
@@ -60,13 +66,15 @@ func init() {
 	Consumerlog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Consumer"})
 	OamLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "OAM"})
 	CtxLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Context"})
+	ConsumerLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "Consumer"})
 	GinLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "GIN"})
+	NotifyEventLog = log.WithFields(logrus.Fields{"component": "PCF", "category": "NotifyEvent"})
 }
 
 func SetLogLevel(level logrus.Level) {
 	log.SetLevel(level)
 }
 
-func SetReportCaller(bool bool) {
-	log.SetReportCaller(bool)
+func SetReportCaller(set bool) {
+	log.SetReportCaller(set)
 }

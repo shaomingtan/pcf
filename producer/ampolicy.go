@@ -3,21 +3,22 @@ package producer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/consumer"
-	pcf_context "free5gc/src/pcf/context"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/util"
 	"net/http"
 	"reflect"
 
 	"github.com/mohae/deepcopy"
+
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/consumer"
+	pcf_context "github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/util"
 )
 
 func HandleDeletePoliciesPolAssoId(request *http_wrapper.Request) *http_wrapper.Response {
-	logger.AMpolicylog.Infof("Handle Policy Association Delete")
+	logger.AMpolicylog.Infof("Handle AM Policy Association Delete")
 
 	polAssoId := request.Params["polAssoId"]
 
@@ -41,7 +42,7 @@ func DeletePoliciesPolAssoIdProcedure(polAssoId string) *models.ProblemDetails {
 
 // PoliciesPolAssoIdGet -
 func HandleGetPoliciesPolAssoId(request *http_wrapper.Request) *http_wrapper.Response {
-	logger.AMpolicylog.Infof("Handle Policy Association Get")
+	logger.AMpolicylog.Infof("Handle AM Policy Association Get")
 
 	polAssoId := request.Params["polAssoId"]
 
@@ -87,7 +88,7 @@ func GetPoliciesPolAssoIdProcedure(polAssoId string) (*models.PolicyAssociation,
 }
 
 func HandleUpdatePostPoliciesPolAssoId(request *http_wrapper.Request) *http_wrapper.Response {
-	logger.AMpolicylog.Infof("Handle Policy Association Update")
+	logger.AMpolicylog.Infof("Handle AM Policy Association Update")
 
 	polAssoId := request.Params["polAssoId"]
 	policyAssociationUpdateRequest := request.Body.(models.PolicyAssociationUpdateRequest)
@@ -125,10 +126,10 @@ func UpdatePostPoliciesPolAssoIdProcedure(polAssoId string,
 		amPolicyData.AltNotifIpv6Addrs = policyAssociationUpdateRequest.AltNotifIpv6Addrs
 	}
 	for _, trigger := range policyAssociationUpdateRequest.Triggers {
-		//TODO: Modify the value according to policies
+		// TODO: Modify the value according to policies
 		switch trigger {
 		case models.RequestTrigger_LOC_CH:
-			//TODO: report to AF subscriber
+			// TODO: report to AF subscriber
 			if policyAssociationUpdateRequest.UserLoc == nil {
 				problemDetail := util.GetProblemDetail("UserLoc are nli", util.ERROR_REQUEST_PARAMETERS)
 				logger.AMpolicylog.Warnln(
@@ -145,7 +146,7 @@ func UpdatePostPoliciesPolAssoIdProcedure(polAssoId string,
 				return nil, &problemDetail
 			}
 			for praId, praInfo := range policyAssociationUpdateRequest.PraStatuses {
-				//TODO: report to AF subscriber
+				// TODO: report to AF subscriber
 				logger.AMpolicylog.Infof("Policy Association Presence Id[%s] change state to %s", praId, praInfo.PresenceState)
 			}
 		case models.RequestTrigger_SERV_AREA_CH:
@@ -169,17 +170,17 @@ func UpdatePostPoliciesPolAssoIdProcedure(polAssoId string,
 			}
 		}
 	}
-	//TODO: handle TraceReq
-	//TODO: Change Request Trigger Policies if needed
+	// TODO: handle TraceReq
+	// TODO: Change Request Trigger Policies if needed
 	response.Triggers = amPolicyData.Triggers
-	//TODO: Change Policies if needed
+	// TODO: Change Policies if needed
 	// rsp.Pras
 	return &response, nil
 }
 
 // Create AM Policy
 func HandlePostPolicies(request *http_wrapper.Request) *http_wrapper.Response {
-	logger.AMpolicylog.Infof("Handle Policy Association Request")
+	logger.AMpolicylog.Infof("Handle AM Policy Create Request")
 
 	polAssoId := request.Params["polAssoId"]
 	policyAssociationRequest := request.Body.(models.PolicyAssociationRequest)
@@ -241,6 +242,11 @@ func PostPoliciesProcedure(polAssoId string,
 			logger.AMpolicylog.Errorf("Can't find UE[%s] AM Policy Data in UDR", ue.Supi)
 			return nil, "", &problemDetail
 		}
+		defer func() {
+			if rspCloseErr := response.Body.Close(); rspCloseErr != nil {
+				logger.AMpolicylog.Errorf("PolicyDataUesUeIdAmDataGet response cannot close: %+v", rspCloseErr)
+			}
+		}()
 		if amPolicy == nil {
 			amPolicy = ue.NewUeAMPolicyData(assolId, policyAssociationRequest)
 		}
@@ -271,14 +277,37 @@ func PostPoliciesProcedure(polAssoId string,
 	locationHeader := util.GetResourceUri(models.ServiceName_NPCF_AM_POLICY_CONTROL, assolId)
 	logger.AMpolicylog.Tracef("AMPolicy association Id[%s] Create", assolId)
 
+	// if consumer is AMF then subscribe this AMF Status
 	if policyAssociationRequest.Guami != nil {
-		// if consumer is AMF then subscribe this AMF Status
-		for _, statusSubsData := range pcfSelf.AMFStatusSubsData {
-			for _, guami := range statusSubsData.GuamiList {
-				if reflect.DeepEqual(guami, policyAssociationRequest.Guami) {
-					amPolicy.AmfStatusChangeSubscription = &statusSubsData
+		// if policyAssociationRequest.Guami has been subscribed, then no need to subscribe again
+		needSubscribe := true
+		pcfSelf.AMFStatusSubsData.Range(func(key, value interface{}) bool {
+			data := value.(pcf_context.AMFStatusSubscriptionData)
+			for _, guami := range data.GuamiList {
+				if reflect.DeepEqual(guami, *policyAssociationRequest.Guami) {
+					needSubscribe = false
+					break
 				}
 			}
+			// if no need to subscribe => stop iteration
+			return needSubscribe
+		})
+
+		if needSubscribe {
+			logger.AMpolicylog.Debugf("Subscribe AMF status change[GUAMI: %+v]", *policyAssociationRequest.Guami)
+			amfUri := consumer.SendNFIntancesAMF(pcfSelf.NrfUri, *policyAssociationRequest.Guami, models.ServiceName_NAMF_COMM)
+			if amfUri != "" {
+				problemDetails, err := consumer.AmfStatusChangeSubscribe(amfUri, []models.Guami{*policyAssociationRequest.Guami})
+				if err != nil {
+					logger.AMpolicylog.Errorf("Subscribe AMF status change error[%+v]", err)
+				} else if problemDetails != nil {
+					logger.AMpolicylog.Errorf("Subscribe AMF status change failed[%+v]", problemDetails)
+				} else {
+					amPolicy.Guami = policyAssociationRequest.Guami
+				}
+			}
+		} else {
+			logger.AMpolicylog.Debugf("AMF status[GUAMI: %+v] has been subscribed", *policyAssociationRequest.Guami)
 		}
 	}
 	return &response, locationHeader, nil
@@ -298,7 +327,6 @@ func SendAMPolicyUpdateNotification(ue *pcf_context.UeContext, PolId string, req
 	client := util.GetNpcfAMPolicyCallbackClient()
 	uri := amPolicyData.NotificationUri
 	for uri != "" {
-
 		rsp, err := client.DefaultCallbackApi.PolicyUpdateNotification(context.Background(), uri, request)
 		if err != nil {
 			if rsp != nil && rsp.StatusCode != http.StatusNoContent {
@@ -311,6 +339,11 @@ func SendAMPolicyUpdateNotification(ue *pcf_context.UeContext, PolId string, req
 			logger.AMpolicylog.Warnln("Policy Update Notification Failed[HTTP Response is nil]")
 			return
 		}
+		defer func() {
+			if rspCloseErr := rsp.Body.Close(); rspCloseErr != nil {
+				logger.AMpolicylog.Errorf("PolicyUpdateNotification response cannot close: %+v", rspCloseErr)
+			}
+		}()
 		if rsp.StatusCode == http.StatusTemporaryRedirect {
 			// for redirect case, resend the notification to redirect target
 			uRI, err := rsp.Location()
@@ -325,7 +358,6 @@ func SendAMPolicyUpdateNotification(ue *pcf_context.UeContext, PolId string, req
 		logger.AMpolicylog.Infoln("Policy Update Notification Success")
 		return
 	}
-
 }
 
 // Send AM Policy Update to AMF if policy has been terminated
@@ -344,7 +376,6 @@ func SendAMPolicyTerminationRequestNotification(ue *pcf_context.UeContext,
 	client := util.GetNpcfAMPolicyCallbackClient()
 	uri := amPolicyData.NotificationUri
 	for uri != "" {
-
 		rsp, err := client.DefaultCallbackApi.PolicyAssocitionTerminationRequestNotification(
 			context.Background(), uri, request)
 		if err != nil {
@@ -358,6 +389,13 @@ func SendAMPolicyTerminationRequestNotification(ue *pcf_context.UeContext,
 			logger.AMpolicylog.Warnln("Policy Assocition Termination Request Notification Failed[HTTP Response is nil]")
 			return
 		}
+		defer func() {
+			if rspCloseErr := rsp.Body.Close(); rspCloseErr != nil {
+				logger.AMpolicylog.Errorf(
+					"PolicyAssociationTerminationRequestNotification response body cannot close: %+v",
+					rspCloseErr)
+			}
+		}()
 		if rsp.StatusCode == http.StatusTemporaryRedirect {
 			// for redirect case, resend the notification to redirect target
 			uRI, err := rsp.Location()
@@ -370,7 +408,6 @@ func SendAMPolicyTerminationRequestNotification(ue *pcf_context.UeContext,
 		}
 		return
 	}
-
 }
 
 // returns UDR Uri of Ue, if ue.UdrUri dose not exist, query NRF to get supported Udr Uri

@@ -1,10 +1,11 @@
 package producer
 
 import (
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
 	"net/http"
+
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/logger"
 )
 
 func HandleAmfStatusChangeNotify(request *http_wrapper.Request) *http_wrapper.Response {

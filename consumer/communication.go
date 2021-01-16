@@ -3,23 +3,24 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/openapi"
-	"free5gc/lib/openapi/models"
-	pcf_context "free5gc/src/pcf/context"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/util"
 	"strings"
+
+	"github.com/free5gc/openapi"
+	"github.com/free5gc/openapi/models"
+	pcf_context "github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/util"
 )
 
-func AmfStatusChangeSubscribe(amfInfo pcf_context.AMFStatusSubscriptionData) (
+func AmfStatusChangeSubscribe(amfUri string, guamiList []models.Guami) (
 	problemDetails *models.ProblemDetails, err error) {
-	logger.Consumerlog.Debugf("PCF Subscribe to AMF status[%+v]", amfInfo.AmfUri)
+	logger.Consumerlog.Debugf("PCF Subscribe to AMF status[%+v]", amfUri)
 	pcfSelf := pcf_context.PCF_Self()
-	client := util.GetNamfClient(amfInfo.AmfUri)
+	client := util.GetNamfClient(amfUri)
 
 	subscriptionData := models.SubscriptionData{
 		AmfStatusUri: fmt.Sprintf("%s/npcf-callback/v1/amfstatus", pcfSelf.GetIPv4Uri()),
-		GuamiList:    amfInfo.GuamiList,
+		GuamiList:    guamiList,
 	}
 
 	res, httpResp, localErr :=
@@ -28,13 +29,13 @@ func AmfStatusChangeSubscribe(amfInfo pcf_context.AMFStatusSubscriptionData) (
 		locationHeader := httpResp.Header.Get("Location")
 		logger.Consumerlog.Debugf("location header: %+v", locationHeader)
 
-		subscriptionId := locationHeader[strings.LastIndex(locationHeader, "/")+1:]
+		subscriptionID := locationHeader[strings.LastIndex(locationHeader, "/")+1:]
 		amfStatusSubsData := pcf_context.AMFStatusSubscriptionData{
-			AmfUri:       amfInfo.AmfUri,
+			AmfUri:       amfUri,
 			AmfStatusUri: res.AmfStatusUri,
 			GuamiList:    res.GuamiList,
 		}
-		pcfSelf.AMFStatusSubsData[subscriptionId] = amfStatusSubsData
+		pcfSelf.NewAmfStatusSubscription(subscriptionID, amfStatusSubsData)
 	} else if httpResp != nil {
 		if httpResp.Status != localErr.Error() {
 			err = localErr
@@ -43,7 +44,7 @@ func AmfStatusChangeSubscribe(amfInfo pcf_context.AMFStatusSubscriptionData) (
 		problem := localErr.(openapi.GenericOpenAPIError).Model().(models.ProblemDetails)
 		problemDetails = &problem
 	} else {
-		err = openapi.ReportError("%s: server no response", amfInfo.AmfUri)
+		err = openapi.ReportError("%s: server no response", amfUri)
 	}
 	return problemDetails, err
 }

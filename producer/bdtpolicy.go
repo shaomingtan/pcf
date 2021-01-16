@@ -3,20 +3,20 @@ package producer
 import (
 	"context"
 	"fmt"
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi/Nnrf_NFDiscovery"
-	"free5gc/lib/openapi/Nudr_DataRepository"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/consumer"
-	pcf_context "free5gc/src/pcf/context"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/util"
 	"net/http"
 
+	"github.com/antihax/optional"
 	"github.com/google/uuid"
 	"github.com/mohae/deepcopy"
 
-	"github.com/antihax/optional"
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi/Nnrf_NFDiscovery"
+	"github.com/free5gc/openapi/Nudr_DataRepository"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/consumer"
+	pcf_context "github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/util"
 )
 
 func HandleGetBDTPolicyContextRequest(request *http_wrapper.Request) *http_wrapper.Response {
@@ -117,10 +117,15 @@ func updateBDTPolicyContextProcedure(request models.BdtPolicyDataPatch, bdtPolic
 				BdtData: optional.NewInterface(bdtData),
 			}
 			client := util.GetNudrClient(getDefaultUdrUri(pcfSelf))
-			_, err := client.DefaultApi.PolicyDataBdtDataBdtReferenceIdPut(context.Background(), bdtData.BdtRefId, &param)
+			rsp, err := client.DefaultApi.PolicyDataBdtDataBdtReferenceIdPut(context.Background(), bdtData.BdtRefId, &param)
 			if err != nil {
 				logger.Bdtpolicylog.Warnf("UDR Put BdtDate error[%s]", err.Error())
 			}
+			defer func() {
+				if rspCloseErr := rsp.Body.Close(); rspCloseErr != nil {
+					logger.Bdtpolicylog.Errorf("PolicyDataBdtDataBdtReferenceIdPut response body cannot close: %+v", rspCloseErr)
+				}
+			}()
 			logger.Bdtpolicylog.Tracef("bdtPolicyID[%s] has Updated with SelTransPolicyId[%d]",
 				bdtPolicyID, request.SelTransPolicyId)
 			return bdtPolicy, nil
@@ -134,7 +139,7 @@ func updateBDTPolicyContextProcedure(request models.BdtPolicyDataPatch, bdtPolic
 	return nil, &problemDetail
 }
 
-//CreateBDTPolicy - Create a new Individual BDT policy
+// CreateBDTPolicy - Create a new Individual BDT policy
 func HandleCreateBDTPolicyContextRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
 	logger.Bdtpolicylog.Infof("Handle CreateBDTPolicyContext")
@@ -158,7 +163,6 @@ func HandleCreateBDTPolicyContextRequest(request *http_wrapper.Request) *http_wr
 
 func createBDTPolicyContextProcedure(request *models.BdtReqData) (
 	header http.Header, response *models.BdtPolicy, problemDetails *models.ProblemDetails) {
-
 	response = &models.BdtPolicy{}
 	logger.Bdtpolicylog.Traceln("Handle BDT Policy Create")
 
@@ -187,6 +191,11 @@ func createBDTPolicyContextProcedure(request *models.BdtReqData) (
 		logger.Bdtpolicylog.Warnf("Query to UDR failed")
 		return nil, nil, problemDetails
 	}
+	defer func() {
+		if rspCloseErr := httpResponse.Body.Close(); rspCloseErr != nil {
+			logger.Bdtpolicylog.Errorf("PolicyDataBdtDataGet response body cannot close: %+v", rspCloseErr)
+		}
+	}()
 	// TODO: decide BDT Policy from other bdt policy data
 	response.BdtReqData = deepcopy.Copy(&request).(*models.BdtReqData)
 	var bdtData *models.BdtData
@@ -220,7 +229,6 @@ func createBDTPolicyContextProcedure(request *models.BdtReqData) (
 	bdtPolicyData.TransfPolicies = append(bdtPolicyData.TransfPolicies, bdtData.TransPolicy)
 	response.BdtPolData = &bdtPolicyData
 	bdtPolicyID, err := pcfSelf.AllocBdtPolicyID()
-
 	if err != nil {
 		problemDetails = &models.ProblemDetails{
 			Status: http.StatusServiceUnavailable,
@@ -236,10 +244,19 @@ func createBDTPolicyContextProcedure(request *models.BdtReqData) (
 	param := Nudr_DataRepository.PolicyDataBdtDataBdtReferenceIdPutParamOpts{
 		BdtData: optional.NewInterface(*bdtData),
 	}
-	_, err = client.DefaultApi.PolicyDataBdtDataBdtReferenceIdPut(context.Background(), bdtPolicyData.BdtRefId, &param)
-	if err != nil {
-		logger.Bdtpolicylog.Warnf("UDR  Put BdtDate error[%s]", err.Error())
+
+	var updateRsp *http.Response
+	if rsp, rspErr := client.DefaultApi.PolicyDataBdtDataBdtReferenceIdPut(context.Background(),
+		bdtPolicyData.BdtRefId, &param); rspErr != nil {
+		logger.Bdtpolicylog.Warnf("UDR Put BdtDate error[%s]", rspErr.Error())
+	} else {
+		updateRsp = rsp
 	}
+	defer func() {
+		if rspCloseErr := updateRsp.Body.Close(); rspCloseErr != nil {
+			logger.Bdtpolicylog.Errorf("PolicyDataBdtDataBdtReferenceIdPut response body cannot close: %+v", rspCloseErr)
+		}
+	}()
 
 	locationHeader := util.GetResourceUri(models.ServiceName_NPCF_BDTPOLICYCONTROL, bdtPolicyID)
 	header = http.Header{

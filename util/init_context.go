@@ -5,11 +5,12 @@ import (
 
 	"github.com/google/uuid"
 
-	"free5gc/lib/openapi"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/context"
-	"free5gc/src/pcf/factory"
-	"free5gc/src/pcf/logger"
+	"github.com/free5gc/MongoDBLibrary"
+	"github.com/free5gc/openapi"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/factory"
+	"github.com/free5gc/pcf/logger"
 )
 
 // Init PCF Context from config flie
@@ -21,11 +22,16 @@ func InitpcfContext(context *context.PCFContext) {
 	if configuration.PcfName != "" {
 		context.Name = configuration.PcfName
 	}
+
+	mongodb := config.Configuration.Mongodb
+	// Connect to MongoDB
+	MongoDBLibrary.SetMongoDB(mongodb.Name, mongodb.Url)
+
 	sbi := configuration.Sbi
 	context.NrfUri = configuration.NrfUri
 	context.UriScheme = ""
-	context.RegisterIPv4 = "127.0.0.1" // default localhost
-	context.SBIPort = 29507            // default port
+	context.RegisterIPv4 = factory.PCF_DEFAULT_IPV4 // default localhost
+	context.SBIPort = factory.PCF_DEFAULT_PORT_INT  // default port
 	if sbi != nil {
 		if sbi.Scheme != "" {
 			context.UriScheme = models.UriScheme(sbi.Scheme)

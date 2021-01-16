@@ -10,18 +10,19 @@
 package smpolicy
 
 import (
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/producer"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/producer"
 )
 
 // SmPoliciesPost -
 func HTTPSmPoliciesPost(c *gin.Context) {
-
 	var smPolicyContextData models.SmPolicyContextData
 	// step 1: retrieve http request body
 	requestBody, err := c.GetRawData()

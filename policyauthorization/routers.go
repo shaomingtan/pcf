@@ -10,12 +10,13 @@
 package policyauthorization
 
 import (
-	"free5gc/lib/logger_util"
-	"free5gc/src/pcf/logger"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/free5gc/logger_util"
+	"github.com/free5gc/pcf/logger"
 )
 
 // Route is the information for every URI.

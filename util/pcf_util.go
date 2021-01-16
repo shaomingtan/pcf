@@ -4,28 +4,29 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"free5gc/lib/openapi/Namf_Communication"
-	"free5gc/lib/openapi/Npcf_AMPolicy"
-	"free5gc/lib/openapi/Npcf_PolicyAuthorization"
-	"free5gc/lib/openapi/Npcf_SMPolicyControl"
-	"free5gc/lib/openapi/Nudr_DataRepository"
-	"free5gc/lib/openapi/models"
-	"free5gc/lib/path_util"
-	"free5gc/src/pcf/context"
-	"free5gc/src/pcf/logger"
 	"net/http"
 	"reflect"
 	"time"
+
+	"github.com/free5gc/openapi/Namf_Communication"
+	"github.com/free5gc/openapi/Npcf_AMPolicy"
+	"github.com/free5gc/openapi/Npcf_PolicyAuthorization"
+	"github.com/free5gc/openapi/Npcf_SMPolicyControl"
+	"github.com/free5gc/openapi/Nudr_DataRepository"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/path_util"
+	"github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/logger"
 )
 
 const TimeFormat = time.RFC3339
 
 // Path of HTTP2 key and log file
 var (
-	PCF_LOG_PATH                                 = path_util.Gofree5gcPath("free5gc/pcfsslkey.log")
-	PCF_PEM_PATH                                 = path_util.Gofree5gcPath("free5gc/support/TLS/pcf.pem")
-	PCF_KEY_PATH                                 = path_util.Gofree5gcPath("free5gc/support/TLS/pcf.key")
-	PCF_CONFIG_PATH                              = path_util.Gofree5gcPath("free5gc/config/pcfcfg.conf")
+	PCF_LOG_PATH                                 = path_util.Free5gcPath("free5gc/pcfsslkey.log")
+	PCF_PEM_PATH                                 = path_util.Free5gcPath("free5gc/support/TLS/pcf.pem")
+	PCF_KEY_PATH                                 = path_util.Free5gcPath("free5gc/support/TLS/pcf.key")
+	PCF_CONFIG_PATH                              = path_util.Free5gcPath("free5gc/config/pcfcfg.yaml")
 	PCF_BASIC_PATH                               = "https://localhost:29507"
 	ERROR_REQUEST_PARAMETERS                     = "ERROR_REQUEST_PARAMETERS"
 	USER_UNKNOWN                                 = "USER_UNKNOWN"
@@ -36,7 +37,7 @@ var (
 	ERROR_TRAFFIC_MAPPING_INFO_REJECTED          = "ERROR_TRAFFIC_MAPPING_INFO_REJECTED"
 	BDT_POLICY_NOT_FOUND                         = "BDT_POLICY_NOT_FOUND"
 	REQUESTED_SERVICE_NOT_AUTHORIZED             = "REQUESTED_SERVICE_NOT_AUTHORIZED"
-	REQUESTED_SERVICE_TEMPORARILY_NOT_AUTHORIZED = "REQUESTED_SERVICE_TEMPORARILY_NOT_AUTHORIZED" //NWDAF
+	REQUESTED_SERVICE_TEMPORARILY_NOT_AUTHORIZED = "REQUESTED_SERVICE_TEMPORARILY_NOT_AUTHORIZED" // NWDAF
 	UNAUTHORIZED_SPONSORED_DATA_CONNECTIVITY     = "UNAUTHORIZED_SPONSORED_DATA_CONNECTIVITY"
 	PDU_SESSION_NOT_AVAILABLE                    = "PDU_SESSION_NOT_AVAILABLE"
 	APPLICATION_SESSION_CONTEXT_NOT_FOUND        = "APPLICATION_SESSION_CONTEXT_NOT_FOUND"
@@ -81,6 +82,7 @@ func GetNudrClient(uri string) *Nudr_DataRepository.APIClient {
 	client := Nudr_DataRepository.NewAPIClient(configuration)
 	return client
 }
+
 func GetNamfClient(uri string) *Namf_Communication.APIClient {
 	configuration := Namf_Communication.NewConfiguration()
 	configuration.SetBasePath(uri)
@@ -152,7 +154,6 @@ func GetSMPolicyDnnData(data models.SmPolicyData, snssai *models.Snssai, dnn str
 		}
 	}
 	return
-
 }
 
 // MarshToJsonString returns value which can put into NewInterface()
@@ -166,7 +167,6 @@ func MarshToJsonString(v interface{}) (result []string) {
 				logger.UtilLog.Errorf("Marshal error: %+v", err)
 			}
 			result = append(result, string(tmp))
-
 		}
 	} else {
 		tmp, err := json.Marshal(v)
@@ -237,27 +237,6 @@ func CheckPolicyControlReqTrig(
 	for _, trigger := range triggers {
 		if trigger == reqTrigger {
 			return true
-		}
-	}
-	return false
-}
-
-func GetNotSubscribedGuamis(guamisIn []models.Guami) (guamisOut []models.Guami) {
-	for _, guami := range guamisIn {
-		if !guamiInSubscriptionData(guami) {
-			guamisOut = append(guamisOut, guami)
-		}
-	}
-	return
-}
-
-func guamiInSubscriptionData(guami models.Guami) bool {
-	pcfSelf := context.PCF_Self()
-	for _, subscriptionData := range pcfSelf.AMFStatusSubsData {
-		for _, sGuami := range subscriptionData.GuamiList {
-			if reflect.DeepEqual(sGuami, guami) {
-				return true
-			}
 		}
 	}
 	return false

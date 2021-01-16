@@ -2,13 +2,14 @@ package context
 
 import (
 	"fmt"
-	"free5gc/lib/idgenerator"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/free5gc/idgenerator"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/logger"
 )
 
 // key is supi
@@ -26,7 +27,7 @@ type UeContext struct {
 	// SMPolicy
 	SmPolicyData map[string]*UeSmPolicyData // use smPolicyId(ue.Supi-pduSessionId) as key
 	// App Session Related
-	//AppSessionIDGenerator uint64
+	// AppSessionIDGenerator uint64
 	AppSessionIDGenerator *idgenerator.IDGenerator
 	// PolicyAuth
 	AfRoutReq *models.AfRoutingRequirement
@@ -62,8 +63,6 @@ type UeAMPolicyData struct {
 	AmPolicyData *models.AmPolicyData // Svbscription Data
 	// Corresponding UE
 	PcfUe *UeContext
-	// AMF status change subscription
-	AmfStatusChangeSubscription *AMFStatusSubscriptionData
 }
 
 type UeSmPolicyData struct {
@@ -159,13 +158,19 @@ func (ue *UeContext) NewUeSmPolicyData(
 	return &data
 }
 
-// Remove Pcc rule wich PccRuleId in the policy
-func (policy *UeSmPolicyData) RemovePccRule(pccRuleId string) error {
+// Remove Pcc rule which PccRuleId in the policy
+func (policy *UeSmPolicyData) RemovePccRule(pccRuleId string, deletedSmPolicyDec *models.SmPolicyDecision) error {
 	decision := policy.PolicyDecision
 	if decision == nil {
 		return fmt.Errorf("Can't find the Policy Decision")
 	}
 	if rule, exist := decision.PccRules[pccRuleId]; exist {
+		if deletedSmPolicyDec != nil {
+			if deletedSmPolicyDec.PccRules == nil {
+				deletedSmPolicyDec.PccRules = make(map[string]*models.PccRule)
+			}
+			deletedSmPolicyDec.PccRules[pccRuleId] = nil
+		}
 		for _, info := range rule.FlowInfos {
 			delete(policy.PackFiltMapToPccRuleId, info.PackFiltId)
 		}
@@ -186,6 +191,12 @@ func (policy *UeSmPolicyData) RemovePccRule(pccRuleId string) error {
 				if len(decision.Conds) == 0 {
 					decision.Conds = nil
 				}
+				if deletedSmPolicyDec != nil {
+					if deletedSmPolicyDec.Conds == nil {
+						deletedSmPolicyDec.Conds = make(map[string]*models.ConditionData)
+					}
+					deletedSmPolicyDec.Conds[rule.RefCondData] = nil
+				}
 			}
 		}
 		for _, id := range rule.RefChgData {
@@ -193,6 +204,12 @@ func (policy *UeSmPolicyData) RemovePccRule(pccRuleId string) error {
 				delete(decision.ChgDecs, id)
 				if len(decision.ChgDecs) == 0 {
 					decision.ChgDecs = nil
+				}
+				if deletedSmPolicyDec != nil {
+					if deletedSmPolicyDec.ChgDecs == nil {
+						deletedSmPolicyDec.ChgDecs = make(map[string]*models.ChargingData)
+					}
+					deletedSmPolicyDec.ChgDecs[id] = nil
 				}
 			} else {
 				break
@@ -204,6 +221,12 @@ func (policy *UeSmPolicyData) RemovePccRule(pccRuleId string) error {
 				if len(decision.TraffContDecs) == 0 {
 					decision.TraffContDecs = nil
 				}
+				if deletedSmPolicyDec != nil {
+					if deletedSmPolicyDec.TraffContDecs == nil {
+						deletedSmPolicyDec.TraffContDecs = make(map[string]*models.TrafficControlData)
+					}
+					deletedSmPolicyDec.TraffContDecs[id] = nil
+				}
 			} else {
 				break
 			}
@@ -213,6 +236,12 @@ func (policy *UeSmPolicyData) RemovePccRule(pccRuleId string) error {
 				delete(decision.UmDecs, id)
 				if len(decision.UmDecs) == 0 {
 					decision.UmDecs = nil
+				}
+				if deletedSmPolicyDec != nil {
+					if deletedSmPolicyDec.UmDecs == nil {
+						deletedSmPolicyDec.UmDecs = make(map[string]*models.UsageMonitoringData)
+					}
+					deletedSmPolicyDec.UmDecs[id] = nil
 				}
 			} else {
 				break
@@ -437,8 +466,10 @@ type AppSessionIdStore struct {
 var AppSessionContextStore []AppSessionIdStore
 
 // BdtPolicyData_store -
-var BdtPolicyData_store []models.BdtPolicyData
-var CreateFailBdtDateStore []models.BdtData
+var (
+	BdtPolicyData_store    []models.BdtPolicyData
+	CreateFailBdtDateStore []models.BdtData
+)
 
 // Convert bitRate string to float64 with uint Kbps
 func ConvertBitRateToKbps(bitRate string) (kBitRate float64, err error) {

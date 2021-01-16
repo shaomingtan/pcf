@@ -1,12 +1,13 @@
 package producer
 
 import (
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/context"
-	"free5gc/src/pcf/logger"
 	"net/http"
 	"strconv"
+
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/logger"
 )
 
 type UEAmPolicy struct {

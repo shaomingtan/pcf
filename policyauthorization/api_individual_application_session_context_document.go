@@ -10,14 +10,15 @@
 package policyauthorization
 
 import (
-	"free5gc/lib/http_wrapper"
-	"free5gc/lib/openapi"
-	"free5gc/lib/openapi/models"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/producer"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/free5gc/http_wrapper"
+	"github.com/free5gc/openapi"
+	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/producer"
 )
 
 // HTTPDeleteAppSession - Deletes an existing Individual Application Session Context
@@ -37,17 +38,20 @@ func HTTPDeleteAppSession(c *gin.Context) {
 		return
 	}
 
-	err = openapi.Deserialize(&eventsSubscReqData, requestBody, "application/json")
-	if err != nil {
-		problemDetail := "[Request Body] " + err.Error()
-		rsp := models.ProblemDetails{
-			Title:  "Malformed request syntax",
-			Status: http.StatusBadRequest,
-			Detail: problemDetail,
+	// EventsSubscReqData is Optional
+	if len(requestBody) > 0 {
+		err = openapi.Deserialize(&eventsSubscReqData, requestBody, "application/json")
+		if err != nil {
+			problemDetail := "[Request Body] " + err.Error()
+			rsp := models.ProblemDetails{
+				Title:  "Malformed request syntax",
+				Status: http.StatusBadRequest,
+				Detail: problemDetail,
+			}
+			logger.PolicyAuthorizationlog.Errorln(problemDetail)
+			c.JSON(http.StatusBadRequest, rsp)
+			return
 		}
-		logger.PolicyAuthorizationlog.Errorln(problemDetail)
-		c.JSON(http.StatusBadRequest, rsp)
-		return
 	}
 
 	req := http_wrapper.NewRequest(c.Request, eventsSubscReqData)

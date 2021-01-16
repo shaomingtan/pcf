@@ -13,14 +13,14 @@ package main
 
 import (
 	"fmt"
-	"free5gc/src/app"
-	"free5gc/src/pcf/logger"
-	"free5gc/src/pcf/service"
-	"free5gc/src/pcf/version"
 	"os"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+
+	"github.com/free5gc/pcf/logger"
+	"github.com/free5gc/pcf/service"
+	"github.com/free5gc/version"
 )
 
 var PCF = &service.PCF{}
@@ -41,13 +41,17 @@ func main() {
 	app.Flags = PCF.GetCliCmd()
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Printf("PCF Run err: %v", err)
+		appLog.Errorf("PCF Run Error: %v", err)
 	}
-
 }
 
-func action(c *cli.Context) {
-	app.AppInitializeWillInitialize(c.String("free5gccfg"))
-	PCF.Initialize(c)
+func action(c *cli.Context) error {
+	if err := PCF.Initialize(c); err != nil {
+		logger.CfgLog.Errorf("%+v", err)
+		return fmt.Errorf("Failed to initialize !!")
+	}
+
 	PCF.Start()
+
+	return nil
 }
