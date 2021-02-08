@@ -15,7 +15,9 @@ import (
 	"github.com/free5gc/openapi"
 	"github.com/free5gc/openapi/Nudr_DataRepository"
 	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/pcf/chf_util"
 	pcf_context "github.com/free5gc/pcf/context"
+	"github.com/free5gc/pcf/factory"
 	"github.com/free5gc/pcf/logger"
 	"github.com/free5gc/pcf/util"
 )
@@ -134,6 +136,22 @@ func createSMPolicyProcedure(request models.SmPolicyContextData) (
 			PriorityLevel: defQos.PriorityLevel,
 			// AverWindow
 			// MaxDataBurstVol
+		}
+	}
+	// TODO: 3GPP states that Nchf_SpendingLimitControl should be queried depending on UDR, to figure out how udr works and when to query Nchf_SpendingLimitControl
+	// Query Nchf_SpendingLimitControl if config queryCHFSpendingLimit is turned on
+	queryCHFSpendingLimit := factory.PcfConfig.Configuration.QueryCHFSpendingLimit
+	if queryCHFSpendingLimit {
+		// Nchf_SpendingLimitControl subscribe and retrieve policyCounters
+		spendingLimitStatus, problemDetail := chf_util.FetchSpendingLimitDecision(ue.Supi, ue.Gpsi)
+
+		if problemDetail != nil {
+			return nil, nil, problemDetail
+		}
+
+		// Make policy decisions based on response
+		if spendingLimitStatus != nil {
+			chf_util.MakeSpendingLimitDecision(spendingLimitStatus, &sessRule)
 		}
 	}
 	decision.SessRules[SessRuleId] = &sessRule

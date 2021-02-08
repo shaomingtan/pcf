@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/free5gc/openapi/Namf_Communication"
+	"github.com/free5gc/openapi/Nchf_SpendingLimitControl"
 	"github.com/free5gc/openapi/Npcf_AMPolicy"
 	"github.com/free5gc/openapi/Npcf_PolicyAuthorization"
 	"github.com/free5gc/openapi/Npcf_SMPolicyControl"
@@ -41,6 +42,7 @@ var (
 	UNAUTHORIZED_SPONSORED_DATA_CONNECTIVITY     = "UNAUTHORIZED_SPONSORED_DATA_CONNECTIVITY"
 	PDU_SESSION_NOT_AVAILABLE                    = "PDU_SESSION_NOT_AVAILABLE"
 	APPLICATION_SESSION_CONTEXT_NOT_FOUND        = "APPLICATION_SESSION_CONTEXT_NOT_FOUND"
+	CHF_SUBSCRIBE_FAILED                         = "CHF_SUBSCRIBE_FAILED"
 	PcpErrHttpStatusMap                          = map[string]int32{
 		ERROR_REQUEST_PARAMETERS:                     http.StatusBadRequest,
 		USER_UNKNOWN:                                 http.StatusBadRequest,
@@ -55,6 +57,7 @@ var (
 		BDT_POLICY_NOT_FOUND:                         http.StatusNotFound,
 		APPLICATION_SESSION_CONTEXT_NOT_FOUND:        http.StatusNotFound,
 		PDU_SESSION_NOT_AVAILABLE:                    http.StatusInternalServerError,
+		CHF_SUBSCRIBE_FAILED:                         http.StatusInternalServerError,
 	}
 )
 
@@ -87,6 +90,13 @@ func GetNamfClient(uri string) *Namf_Communication.APIClient {
 	configuration := Namf_Communication.NewConfiguration()
 	configuration.SetBasePath(uri)
 	client := Namf_Communication.NewAPIClient(configuration)
+	return client
+}
+
+func GetNchfClient(uri string) *Nchf_SpendingLimitControl.APIClient {
+	configuration := Nchf_SpendingLimitControl.NewConfiguration()
+	configuration.SetBasePath(uri)
+	client := Nchf_SpendingLimitControl.NewAPIClient(configuration)
 	return client
 }
 
