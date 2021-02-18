@@ -143,11 +143,10 @@ func createSMPolicyProcedure(request models.SmPolicyContextData) (
 	// We need to determine what attribute in the subscription info is used to signal this.
 	// 1 potential clue could be in the SessionManagementPolicyData that is retrived from UDR but I can't seem to find much information so far. see TS 129 519 section 5.2.5
 	// Another potential clue could be in the smPolicyContextData either provided by SMF or if not present, configured in the PCF as it includes a bunch of attributes relating to charging. See TS 129 512 Section 4.2.2.3.2
-	// Nchf_SpendingLimitControl_subscribe request if config queryCHFSpendingLimit is turned on
+	// Initial SpendingLimit Report to chf
 	queryCHFSpendingLimit := factory.PcfConfig.Configuration.QueryCHFSpendingLimit
 	if queryCHFSpendingLimit {
-		// Nchf_SpendingLimitControl subscribe and retrieve policyCounters
-		spendingLimitStatus, problemDetail := chf_util.SubscribeSpendingLimit(ue.Supi, ue.Gpsi)
+		spendingLimitStatus, problemDetail := chf_util.InitialSpendingLimitReport(ue.Supi, ue.Gpsi)
 
 		if problemDetail != nil {
 			return nil, nil, problemDetail
@@ -158,6 +157,22 @@ func createSMPolicyProcedure(request models.SmPolicyContextData) (
 			chf_util.MakeSpendingLimitDecision(spendingLimitStatus, &sessRule)
 		}
 	}
+
+	// TODO figure out where to put this
+	// Intermediate SpendingLimit Report to chf
+	if queryCHFSpendingLimit {
+		spendingLimitStatus, problemDetail := chf_util.IntermediateSpendingLimitReport(ue.Supi, ue.Gpsi)
+
+		if problemDetail != nil {
+			return nil, nil, problemDetail
+		}
+
+		// Make policy decisions
+		if spendingLimitStatus != nil {
+			chf_util.MakeSpendingLimitDecision(spendingLimitStatus, &sessRule)
+		}
+	}
+
 	decision.SessRules[SessRuleId] = &sessRule
 	// TODO: See how UDR used
 	dnnData := util.GetSMPolicyDnnData(smData, request.SliceInfo, request.Dnn)
@@ -287,6 +302,17 @@ func deleteSmPolicyContextProcedure(smPolicyID string) *models.ProblemDetails {
 			SendAppSessionTermination(appSession, terminationInfo)
 			pcfSelf.AppSessionPool.Delete(appSessionID)
 			logger.SMpolicylog.Tracef("SMPolicy[%s] DELETE Related AppSession[%s]", smPolicyID, appSessionID)
+		}
+	}
+	// TODO: Figure out where in the code to properly locate this logic
+	// Final SpendingLimit Report to chf
+	queryCHFSpendingLimit := factory.PcfConfig.Configuration.QueryCHFSpendingLimit
+	if queryCHFSpendingLimit {
+		// Nchf_SpendingLimitControl unsubscribe
+		problemDetail := chf_util.FinalSpendingLimitReport(ue.Supi, ue.Gpsi)
+
+		if problemDetail != nil {
+			return problemDetail
 		}
 	}
 	return nil

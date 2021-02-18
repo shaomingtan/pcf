@@ -43,6 +43,7 @@ var (
 	PDU_SESSION_NOT_AVAILABLE                    = "PDU_SESSION_NOT_AVAILABLE"
 	APPLICATION_SESSION_CONTEXT_NOT_FOUND        = "APPLICATION_SESSION_CONTEXT_NOT_FOUND"
 	CHF_SUBSCRIBE_FAILED                         = "CHF_SUBSCRIBE_FAILED"
+	CHF_UNSUBSCRIBE_FAILED                       = "CHF_UNSUBSCRIBE_FAILED"
 	PcpErrHttpStatusMap                          = map[string]int32{
 		ERROR_REQUEST_PARAMETERS:                     http.StatusBadRequest,
 		USER_UNKNOWN:                                 http.StatusBadRequest,
