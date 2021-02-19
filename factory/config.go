@@ -6,6 +6,7 @@ package factory
 
 import (
 	"github.com/free5gc/logger_util"
+	"github.com/free5gc/openapi/models"
 )
 
 const (
@@ -30,13 +31,21 @@ const (
 )
 
 type Configuration struct {
-	PcfName         string    `yaml:"pcfName,omitempty"`
-	Sbi             *Sbi      `yaml:"sbi,omitempty"`
-	TimeFormat      string    `yaml:"timeFormat,omitempty"`
-	DefaultBdtRefId string    `yaml:"defaultBdtRefId,omitempty"`
-	NrfUri          string    `yaml:"nrfUri,omitempty"`
-	ServiceList     []Service `yaml:"serviceList,omitempty"`
-	Mongodb         *Mongodb  `yaml:"mongodb"`
+	PcfName               string              `yaml:"pcfName,omitempty"`
+	Sbi                   *Sbi                `yaml:"sbi,omitempty"`
+	TimeFormat            string              `yaml:"timeFormat,omitempty"`
+	DefaultBdtRefId       string              `yaml:"defaultBdtRefId,omitempty"`
+	NrfUri                string              `yaml:"nrfUri,omitempty"`
+	ServiceList           []Service           `yaml:"serviceList,omitempty"`
+	Mongodb               *Mongodb            `yaml:"mongodb"`
+	QueryCHFSpendingLimit bool                `yaml:"queryCHFSpendingLimit"`
+	CustomSessionRules    []CustomSessionRule `yaml:"customSessionRules"`
+}
+
+type CustomSessionRule struct {
+	RuleName     string                       `yaml:"ruleName"`
+	AuthSessAmbr *models.Ambr                 `yaml:"authSessAmbr"`
+	AuthDefQos   *models.AuthorizedDefaultQos `yaml:"authDefQos"`
 }
 
 type Service struct {
